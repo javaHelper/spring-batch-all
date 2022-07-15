@@ -1,0 +1,16 @@
+spring:
+  batch:
+    jdbc:
+      initialize-schema: always
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/test
+    username: 'root'
+    password: 'Password'
+
+  jpa:
+    show-sql: true
+    hibernate:
+      naming:
+        implicit-strategy: "org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl"
+        physical-strategy: "org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl"

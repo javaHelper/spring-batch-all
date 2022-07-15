@@ -1,0 +1,14 @@
+#spring:
+#  batch:
+#    jdbc:
+#      initialize-schema: always
+#    job:
+#      enabled: false
+#  datasource:
+#    driverClassName: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://localhost:3306/test?useSSL=false
+#    username: 'root'
+#    password: 'Password'
+#
+#
+#
