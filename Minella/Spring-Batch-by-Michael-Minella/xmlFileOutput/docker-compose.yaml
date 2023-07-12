@@ -1,0 +1,5 @@
+version: "3.0"
+services:
+ xml-file-output:
+  build: .
+  image: xml-file-output
