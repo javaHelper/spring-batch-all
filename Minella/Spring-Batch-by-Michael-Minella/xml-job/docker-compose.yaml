@@ -1,0 +1,8 @@
+version: "3.7"
+services:
+  xml-job:
+    build: .
+    image: xml-job
+    ports:
+      - '8080:8080'
+    container_name: xml-job
