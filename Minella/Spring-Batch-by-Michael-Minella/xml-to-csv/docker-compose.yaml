@@ -1,0 +1,8 @@
+version: "3.7"
+services:
+  xml-to-csv:
+    build: .
+    image: xml-to-csv
+    container_name: xml-to-csv
+    ports:
+      - '8080:8080'
