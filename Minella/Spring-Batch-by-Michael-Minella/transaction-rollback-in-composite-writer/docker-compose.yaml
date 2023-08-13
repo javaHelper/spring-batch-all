@@ -1,0 +1,25 @@
+version: "3.0"
+services:
+  mysql:
+    image: 'mysql:8.0.32'
+    container_name: mysql
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_DATABASE: test
+      MYSQL_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - 'db_data:/var/lib/mysql'
+
+  transaction-rollback-in-composite-writer:
+    build: .
+    image: transaction-rollback-in-composite-writer
+    container_name: transaction-rollback-in-composite-writer
+    depends_on:
+      - mysql
+    ports:
+      - '8080:8080'
+
+volumes:
+  db_data: {}

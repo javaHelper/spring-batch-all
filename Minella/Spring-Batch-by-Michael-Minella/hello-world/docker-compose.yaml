@@ -1,6 +1,0 @@
-version: "3.0"
-services:
-  hello-world:
-    build: .
-    image: hello-world
-    container_name: hello-world

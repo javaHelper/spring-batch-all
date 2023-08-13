@@ -1,0 +1,6 @@
+com/example/model/Customer.class
+com/example/configuration/JobConfiguration.class
+com/example/WrittingMultipleDestinationsApplication.class
+com/example/aggregator/CustomLineAggregator.class
+com/example/mapper/CustomerRowMapper.class
+com/example/model/Customer$CustomerBuilder.class

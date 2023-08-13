@@ -1,0 +1,5 @@
+/Users/prats/Documents/Prateek/spring-batch-latest/Minella/Spring-Batch-by-Michael-Minella/writtingMultipleDestinations/src/main/java/com/example/mapper/CustomerRowMapper.java
+/Users/prats/Documents/Prateek/spring-batch-latest/Minella/Spring-Batch-by-Michael-Minella/writtingMultipleDestinations/src/main/java/com/example/model/Customer.java
+/Users/prats/Documents/Prateek/spring-batch-latest/Minella/Spring-Batch-by-Michael-Minella/writtingMultipleDestinations/src/main/java/com/example/configuration/JobConfiguration.java
+/Users/prats/Documents/Prateek/spring-batch-latest/Minella/Spring-Batch-by-Michael-Minella/writtingMultipleDestinations/src/main/java/com/example/aggregator/CustomLineAggregator.java
+/Users/prats/Documents/Prateek/spring-batch-latest/Minella/Spring-Batch-by-Michael-Minella/writtingMultipleDestinations/src/main/java/com/example/WrittingMultipleDestinationsApplication.java

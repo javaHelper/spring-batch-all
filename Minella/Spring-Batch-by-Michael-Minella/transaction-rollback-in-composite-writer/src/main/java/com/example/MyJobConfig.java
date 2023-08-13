@@ -35,8 +35,9 @@ public class MyJobConfig {
 	@Bean
 	public ItemReader<Person> itemReader() {
 		Person foo = new Person(1, "foo");
-		Person bar = new Person(2, "bar");
-		Person bazz = new Person(3, "bazz");
+		Person john = new Person(2, "John");
+		Person bar = new Person(3, "bar");
+		Person bazz = new Person(4, "bazz");
 		return new ListItemReader<>(Arrays.asList(foo, bar, bazz));
 	}
 

@@ -22,6 +22,7 @@ public class InsertItemWriter implements ItemWriter<Person> {
 		for (Person person : items) {
 			if ("bar".equalsIgnoreCase(person.getName())) {
 				jdbcTemplate.update("INSERT INTO person (id, name) VALUES (?, ?)", person.getId(), person.getName());
+				System.out.println("####### Performing Rollbacl  #########");
 				throw new IllegalStateException("Something went wrong!");
 			}
 			//jdbcTemplate.update("INSERT INTO person (id, name) VALUES (?, ?)", person.getId(), person.getName());
