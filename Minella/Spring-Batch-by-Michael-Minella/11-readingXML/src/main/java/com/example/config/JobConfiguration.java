@@ -1,13 +1,7 @@
 package com.example.config;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.sql.DataSource;
-
+import com.example.domain.Customer;
+import com.thoughtworks.xstream.security.AnyTypePermission;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -21,9 +15,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.oxm.xstream.XStreamMarshaller;
 
-import com.example.domain.Customer;
-import com.example.processor.CustomerProcessor;
-import com.thoughtworks.xstream.security.AnyTypePermission;
+import javax.sql.DataSource;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 public class JobConfiguration {
@@ -62,16 +58,10 @@ public class JobConfiguration {
 	}
 
 	@Bean
-	public CustomerProcessor customerProcessor() {
-		return new CustomerProcessor();
-	}
-
-	@Bean
 	public Step step1() {
 		return stepBuilderFactory.get("step1")
 				.<Customer, Customer>chunk(200)
 				.reader(customerItemReader())
-				.processor(customerProcessor())
 				.writer(writer())
 				.build();
 	}
