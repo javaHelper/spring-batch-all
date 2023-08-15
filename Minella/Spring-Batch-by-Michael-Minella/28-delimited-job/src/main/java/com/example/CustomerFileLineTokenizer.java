@@ -20,8 +20,7 @@ public class CustomerFileLineTokenizer implements LineTokenizer {
 
         for (int i = 0; i < fields.length; i++) {
             if (i == 4) {
-                parsedFields.set(i - 1,
-                        parsedFields.get(i - 1) + " " + fields[i]);
+                parsedFields.set(i - 1, parsedFields.get(i - 1) + " " + fields[i]);
             } else {
                 parsedFields.add(fields[i]);
             }
