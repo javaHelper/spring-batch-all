@@ -39,16 +39,7 @@ public class JobConfig {
     @Bean
     public ClassifierCompositeItemWriter<Person> classifierCompositeItemWriter(ItemWriter<Person> fooItemWriter, ItemWriter<Person> barItemWriter) {
         ClassifierCompositeItemWriter<Person> classifierCompositeItemWriter = new ClassifierCompositeItemWriter<>();
-        classifierCompositeItemWriter.setClassifier(new Classifier<Person, ItemWriter<? super Person>>() {
-            @Override
-            public ItemWriter<? super Person> classify(Person person) {
-                if (person.getName().startsWith("foo")) {
-                    return fooItemWriter;
-                } else {
-                    return barItemWriter;
-                }
-            }
-        });
+        classifierCompositeItemWriter.setClassifier(new PersonClassifier(fooItemWriter(), barItemWriter()));
         return classifierCompositeItemWriter;
     }
 
