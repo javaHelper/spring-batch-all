@@ -10,8 +10,8 @@ public class CustomerClassifier implements Classifier<Customer, ItemWriter<? sup
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private ItemWriter<Customer> fileItemWriter;
-    private ItemWriter<Customer> jdbcItemWriter;
+	private final ItemWriter<Customer> fileItemWriter;
+    private final ItemWriter<Customer> jdbcItemWriter;
 
     public CustomerClassifier(StaxEventItemWriter<Customer> fileItemWriter, JdbcBatchItemWriter<Customer> jdbcItemWriter) {
         this.fileItemWriter = fileItemWriter;
