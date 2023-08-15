@@ -39,7 +39,7 @@ public class JobConfiguration {
 		// Sort Keys
 		Map<String, Order> sortKeys = new HashMap<>();
 		sortKeys.put("id", Order.ASCENDING);
-		
+
 		// MySQL implementation of a PagingQueryProvider using database specific features.
 		MySqlPagingQueryProvider queryProvider = new MySqlPagingQueryProvider();
 		queryProvider.setSelectClause("id, firstName, lastName, birthdate");
