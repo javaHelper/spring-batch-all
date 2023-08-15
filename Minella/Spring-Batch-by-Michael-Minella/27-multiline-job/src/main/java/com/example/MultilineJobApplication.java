@@ -109,7 +109,7 @@ public class MultilineJobApplication {
     }
 
     public static void main(String[] args) {
-        List<String> realArgs = Collections.singletonList("customerFile=/input/customerMultiFormat.csv");
+        List<String> realArgs = Collections.singletonList("customerFile=/input/customerMultiFormat1.csv");
         SpringApplication.run(MultilineJobApplication.class, realArgs.toArray(new String[1]));
     }
 }
