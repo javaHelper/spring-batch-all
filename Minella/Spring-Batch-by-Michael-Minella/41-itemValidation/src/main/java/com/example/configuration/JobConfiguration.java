@@ -8,6 +8,7 @@ import javax.sql.DataSource;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
@@ -27,6 +28,8 @@ import com.example.mapper.CustomerRowMapper;
 import com.example.model.Customer;
 import com.example.validation.CustomerValidator;
 
+
+@EnableBatchProcessing
 @Configuration
 public class JobConfiguration {
 	@Autowired
