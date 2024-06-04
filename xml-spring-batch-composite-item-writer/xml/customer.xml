@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Customers>
+    <Customer>
+        <id>2</id>
+        <firstName>Jane</firstName>
+        <lastName>Doe</lastName>
+        <birthdate>jane.doe@gmail.com</birthdate>
+    </Customer>
+</Customers>
