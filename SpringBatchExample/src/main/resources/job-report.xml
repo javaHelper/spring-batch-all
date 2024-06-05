@@ -8,6 +8,8 @@
 		http://www.springframework.org/schema/util 
 		http://www.springframework.org/schema/util/spring-util-3.2.xsd">
 
+	<import resource="classpath:context.xml"/>
+
 	<batch:job id="reportJob">
 		<batch:step id="step1">
 			<batch:tasklet>
@@ -29,29 +31,23 @@
 		<property name="unmarshaller" ref="reportUnmarshaller" />
 	</bean>
 
-	<bean id="reportUnmarshaller" class="org.springframework.oxm.xstream.XStreamMarshaller">
+	<bean id="typePermission" class="com.thoughtworks.xstream.security.ExplicitTypePermission">
+		<constructor-arg value="com.mkyong.model.Report"/> <!-- string to array conversion automatically done by spring here -->
+	</bean>
 
+	<bean id="reportUnmarshaller" class="org.springframework.oxm.xstream.XStreamMarshaller">
+		<property name="typePermissions" ref="typePermission"/>
 		<property name="aliases">
 			<util:map id="aliases">
 				<entry key="record" value="com.mkyong.model.Report" />
-				
-				<!-- 
-				<entry key="date" value="java.lang.String" />
-				<entry key="impression" value="java.lang.Long" />
-				<entry key="clicks" value="java.lang.Integer" />
-				<entry key="earning" value="java.math.BigDecimal" />
-				 -->
 			</util:map>
 		</property>
-
 		<property name="converters">
 			<array>
 				<ref bean="reportConverter" />
 			</array>
 		</property>
-
 	</bean>
 
 	<bean id="reportConverter" class="com.mkyong.converter.ReportConverter" />
-
 </beans>
