@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report>
+	<record id="1">
+		<impression>213100</impression>
+		<clicks>980</clicks>
+		<earning>1000</earning>
+		<date>2022-07-20</date>
+	</record>
+	<record id="2">
+		<impression>213100</impression>
+		<clicks>478</clicks>
+		<earning>1200</earning>
+		<date>2024-07-20</date>
+	</record>
+</report>
