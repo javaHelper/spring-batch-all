@@ -1,6 +1,7 @@
 package com.example;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -41,11 +42,14 @@ public class MyJobConfig {
         writer.setLineAggregator(new PassThroughLineAggregator<>());
         writer.setName("chunkFileItemWriter");
         
-        return items -> {
-            writer.setResource(new FileSystemResource("foos-" + getTimestamp() + ".txt"));
-            writer.open(new ExecutionContext());
-            writer.write(items);
-            writer.close();
+        return new ItemWriter<String>() {
+            @Override
+            public void write(List<? extends String> items) throws Exception {
+                writer.setResource(new FileSystemResource("foos-" + MyJobConfig.this.getTimestamp() + ".txt"));
+                writer.open(new ExecutionContext());
+                writer.write(items);
+                writer.close();
+            }
         };
     }
 
