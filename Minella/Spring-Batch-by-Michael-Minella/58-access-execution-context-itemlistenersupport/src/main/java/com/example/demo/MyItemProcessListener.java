@@ -8,6 +8,12 @@ import org.springframework.batch.item.ItemStreamException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Marker interface defining a contract for periodically storing state and restoring from that state should an 
+ * error occur.
+ *
+ */
+
 class MyItemProcessListener implements ItemProcessListener<Integer, Integer>, ItemStream {
 
         private ExecutionContext executionContext;
