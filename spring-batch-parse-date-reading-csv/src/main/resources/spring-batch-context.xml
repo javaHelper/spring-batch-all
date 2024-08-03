@@ -21,6 +21,30 @@
         </batch:step>
     </batch:job>
 
+    <bean id="locale" class="java.util.Locale">
+        <constructor-arg value="en" />
+        <constructor-arg value="US" />
+    </bean>
+
+    <bean id="dateEditor" class="org.springframework.beans.propertyeditors.CustomDateEditor">
+        <constructor-arg>
+            <bean class="java.time.format.DateTimeFormatter">
+                <constructor-arg value="MMM d yyyy h:mm:ss:SSSa" />
+            </bean>
+        </constructor-arg>
+        <constructor-arg value="true" />
+    </bean>
+
+    <bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+        <property name="customEditors">
+            <map>
+                <entry key="java.util.Date">
+                    <ref bean="dateEditor" />
+                </entry>
+            </map>
+        </property>
+    </bean>
+
 
     <bean id="flatFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader" scope="step">
         <property name="resource" value="classpath:employee.csv" />
@@ -28,8 +52,9 @@
         <property name="lineMapper">
             <bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
                 <property name="fieldSetMapper">
-                    <!-- Mapper which maps each individual items in a record to properties in POJO -->
-                    <bean class="com.example.EmployeeFieldSetMapper" />
+                    <bean class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
+                        <property name="conversionService" ref="" />
+                    </bean>
                 </property>
                 <property name="lineTokenizer">
                     <!-- A tokenizer class to be used when items in input record are separated by specific characters -->
@@ -43,4 +68,5 @@
     </bean>
 
     <bean id="employeeWriter" class="com.example.EmployeeItemWriter" />
+    <bean id="domain" class="com.example.Employee" scope="prototype" />
 </beans>

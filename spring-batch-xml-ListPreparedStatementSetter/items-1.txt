@@ -1,0 +1,6 @@
+empId,firstName,lastName,role
+1,John ,Doe,Java Developer
+2,Jane ,Doe,Python Developer
+3,Jane ,Doe,Cloud Developer
+4,Mike ,Doe,Java Developer
+5,Jack ,Doe,Python Developer
