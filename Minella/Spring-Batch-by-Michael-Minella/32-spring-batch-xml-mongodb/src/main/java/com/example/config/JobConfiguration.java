@@ -28,7 +28,6 @@ public class JobConfiguration {
 	private StepBuilderFactory stepBuilderFactory;
 	
 	
-
 	@SuppressWarnings("rawtypes")
 	@Bean
 	public StaxEventItemReader<Customer> customerItemReader(){

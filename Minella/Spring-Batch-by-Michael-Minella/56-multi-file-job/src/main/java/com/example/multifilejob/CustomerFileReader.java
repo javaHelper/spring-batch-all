@@ -7,6 +7,11 @@ import org.springframework.core.io.Resource;
 
 import java.util.ArrayList;
 
+
+/**
+ * Interface for ItemReaders that implement ItemStream and read input from Resource.
+ */
+
 public class CustomerFileReader implements ResourceAwareItemReaderItemStream<Customer> {
 	private Object curItem = null;
 	private ResourceAwareItemReaderItemStream<Object> delegate;

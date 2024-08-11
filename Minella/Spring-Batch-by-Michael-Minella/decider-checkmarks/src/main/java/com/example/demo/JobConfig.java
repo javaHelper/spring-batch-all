@@ -85,15 +85,17 @@ public class JobConfig {
     public Job job(){
         return jobBuilderFactory.get("job")
                 .flow(validateCsvHeaderStepStep())
-                .on(ExitStatus.FAILED.getExitCode()).to(markCsvAsFailedStep())
-                .from(validateCsvHeaderStepStep()).on("*").to(processCsvStep())
-
-                .from(processCsvStep()).on(ExitStatus.FAILED.getExitCode()).to(markCsvAsFailedStep())
-                .from(processCsvStep()).on("*").to(moveCsvStep())
-
-                .from(markCsvAsFailedStep()).on("*").to(moveFailedCsvStep())
-
-                .from(moveFailedCsvStep()).end()
+                	.on(ExitStatus.FAILED.getExitCode()).to(markCsvAsFailedStep())
+                .from(validateCsvHeaderStepStep())
+                	.on("*").to(processCsvStep())
+                .from(processCsvStep())
+                	.on(ExitStatus.FAILED.getExitCode()).to(markCsvAsFailedStep())
+                .from(processCsvStep())
+                	.on("*").to(moveCsvStep())
+                .from(markCsvAsFailedStep())
+                	.on("*").to(moveFailedCsvStep())
+                .from(moveFailedCsvStep())
+                	.end()
                 .build();
     }
 }

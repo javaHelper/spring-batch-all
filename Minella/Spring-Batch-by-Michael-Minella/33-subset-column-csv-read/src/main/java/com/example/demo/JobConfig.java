@@ -24,6 +24,7 @@ public class JobConfig {
     public FlatFileItemReader<Person> itemReader() {
         return new FlatFileItemReaderBuilder<Person>()
                 .name("personItemReader")
+                .linesToSkip(1)
                 .resource(new ClassPathResource("persons.csv"))
                 .delimited()
                 .includedFields(new Integer[] {0, 2})

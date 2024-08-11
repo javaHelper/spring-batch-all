@@ -13,7 +13,8 @@ public class CustomerClassifier implements Classifier<Customer, ItemWriter<? sup
 	private final ItemWriter<Customer> fileItemWriter;
     private final ItemWriter<Customer> jdbcItemWriter;
 
-    public CustomerClassifier(StaxEventItemWriter<Customer> fileItemWriter, JdbcBatchItemWriter<Customer> jdbcItemWriter) {
+    public CustomerClassifier(StaxEventItemWriter<Customer> fileItemWriter, 
+    						  JdbcBatchItemWriter<Customer> jdbcItemWriter) {
         this.fileItemWriter = fileItemWriter;
         this.jdbcItemWriter = jdbcItemWriter;
     }

@@ -5,6 +5,12 @@ import org.springframework.classify.Classifier;
 
 import com.example.model.Customer;
 
+
+/**
+ * Interface for a classifier. At its simplest a Classifier is just a map from objects of one type to objects of another type. 
+ * Note that implementations can only be serializable if the parameter types are themselves serializable.
+ */
+
 public class CustomerClassifier implements Classifier<Customer, ItemWriter<? super Customer>>{
 	private static final long serialVersionUID = 1L;
 

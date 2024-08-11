@@ -1,0 +1,17 @@
+{
+  "groups": [
+    {
+      "name": "versioned.batch",
+      "type": "io.spring.versionedbatchjob.configuration.VersionedBatchJobProperties",
+      "sourceType": "io.spring.versionedbatchjob.configuration.VersionedBatchJobProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "versioned.batch.wait",
+      "type": "java.lang.Long",
+      "sourceType": "io.spring.versionedbatchjob.configuration.VersionedBatchJobProperties"
+    }
+  ],
+  "hints": []
+}

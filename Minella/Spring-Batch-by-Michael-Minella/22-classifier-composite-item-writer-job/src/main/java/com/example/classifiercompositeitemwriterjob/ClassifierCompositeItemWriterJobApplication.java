@@ -85,8 +85,8 @@ public class ClassifierCompositeItemWriterJobApplication {
 
     @Bean
     public ClassifierCompositeItemWriter<Customer> classifierCompositeItemWriter() throws Exception {
-        Classifier<Customer, ItemWriter<? super Customer>> classifier =
-                new CustomerClassifier(xmlDelegate(), jdbcDelgate(null));
+        Classifier<Customer, ItemWriter<? super Customer>> classifier = new CustomerClassifier(xmlDelegate(), jdbcDelgate(null));
+        
         return new ClassifierCompositeItemWriterBuilder<Customer>()
                 .classifier(classifier)
                 .build();

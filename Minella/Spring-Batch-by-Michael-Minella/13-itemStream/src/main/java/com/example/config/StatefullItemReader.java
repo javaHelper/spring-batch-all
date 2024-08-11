@@ -9,6 +9,10 @@ import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 
+/**
+ * Convenience interface that combines ItemStream and ItemReader .
+ */
+
 public class StatefullItemReader implements ItemStreamReader<String> {
 
     private final List<String> items;

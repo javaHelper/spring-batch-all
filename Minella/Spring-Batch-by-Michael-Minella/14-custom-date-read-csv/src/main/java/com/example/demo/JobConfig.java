@@ -1,5 +1,8 @@
 package com.example.demo;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -16,14 +19,14 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.core.io.ClassPathResource;
 
-import java.time.LocalDate;
-
 @Configuration
 public class JobConfig {
     @Autowired
     private StepBuilderFactory stepBuilderFactory;
     @Autowired
     private JobBuilderFactory jobBuilderFactory;
+    
+    private static DateTimeFormatter DF = DateTimeFormatter.ofPattern("yyyy/MM/dd");
 
     @Bean
     public FlatFileItemReader<PersonDto> flatFileItemReader(){
@@ -31,7 +34,7 @@ public class JobConfig {
         service.addConverter(new Converter<String, LocalDate>() {
             @Override
             public LocalDate convert(String source) {
-                return LocalDate.parse(source);
+                return LocalDate.parse(source, DF);
             }
         });
 

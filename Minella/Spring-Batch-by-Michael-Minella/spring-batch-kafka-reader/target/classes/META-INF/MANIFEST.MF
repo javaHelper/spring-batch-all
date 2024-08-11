@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Built-By: prateekashtikar
+Build-Jdk: 17.0.1
+Implementation-Title: spring-batch-kafka-reader
+Implementation-Version: 0.0.1-SNAPSHOT
+Implementation-Vendor-Id: com.example
+Implementation-URL: https://spring.io/projects/spring-boot/spring-batch-
+ kafka-reader
+Created-By: Maven Integration for Eclipse
+

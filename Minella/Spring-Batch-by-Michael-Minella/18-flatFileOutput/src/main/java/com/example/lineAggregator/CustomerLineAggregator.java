@@ -5,6 +5,10 @@ import org.springframework.batch.item.file.transform.LineAggregator;
 import com.example.model.Customer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * Interface used to create string representing object.
+ */
+
 public class CustomerLineAggregator implements LineAggregator<Customer>{
 	private ObjectMapper objectMapper = new ObjectMapper();
 	

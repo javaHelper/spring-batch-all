@@ -12,10 +12,17 @@
         <property name="jobRepository" ref="jobRepository"/>
     </bean>
 
+    <bean id="myConverter" class="com.example.MyConverter" />
+
+    <bean id="conversionService" class="com.example.MyConversionService">
+        <property name="myConverter" ref="myConverter" />
+    </bean>
+
     <batch:job id="employeeJob">
         <batch:step id="step1">
             <batch:tasklet transaction-manager="transactionManager">
-                <batch:chunk reader="flatFileItemReader" writer="employeeWriter"
+                <batch:chunk reader="flatFileItemReader"
+                             writer="employeeWriter"
                              commit-interval="10"/>
             </batch:tasklet>
         </batch:step>
@@ -26,24 +33,24 @@
         <constructor-arg value="US" />
     </bean>
 
-    <bean id="dateEditor" class="org.springframework.beans.propertyeditors.CustomDateEditor">
-        <constructor-arg>
-            <bean class="java.time.format.DateTimeFormatter">
-                <constructor-arg value="MMM d yyyy h:mm:ss:SSSa" />
-            </bean>
-        </constructor-arg>
-        <constructor-arg value="true" />
-    </bean>
+<!--    <bean id="dateEditor" class="org.springframework.beans.propertyeditors.CustomDateEditor">-->
+<!--        <constructor-arg>-->
+<!--            <bean class="java.time.format.DateTimeFormatter">-->
+<!--                <constructor-arg value="MMM d yyyy h:mm:ss:SSSa" />-->
+<!--            </bean>-->
+<!--        </constructor-arg>-->
+<!--        <constructor-arg value="true" />-->
+<!--    </bean>-->
 
-    <bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
-        <property name="customEditors">
-            <map>
-                <entry key="java.util.Date">
-                    <ref bean="dateEditor" />
-                </entry>
-            </map>
-        </property>
-    </bean>
+<!--    <bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">-->
+<!--        <property name="customEditors">-->
+<!--            <map>-->
+<!--                <entry key="java.util.Date">-->
+<!--                    <ref bean="dateEditor" />-->
+<!--                </entry>-->
+<!--            </map>-->
+<!--        </property>-->
+<!--    </bean>-->
 
 
     <bean id="flatFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader" scope="step">
@@ -53,7 +60,8 @@
             <bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
                 <property name="fieldSetMapper">
                     <bean class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
-                        <property name="conversionService" ref="" />
+                        <property name="prototypeBeanName" value="domain" />
+                        <property name="conversionService" ref="conversionService" />
                     </bean>
                 </property>
                 <property name="lineTokenizer">

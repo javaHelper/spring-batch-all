@@ -24,7 +24,7 @@ public class JobParametersApplication implements CommandLineRunner{
 	private Job job;
 	
 	public static void main(String[] args) {
-		SpringApplication.run(JobParametersApplication.class, "message=Aravind Dekate");
+		SpringApplication.run(JobParametersApplication.class, "message1=Aravind Dekate");
 	}
 
 	@Override

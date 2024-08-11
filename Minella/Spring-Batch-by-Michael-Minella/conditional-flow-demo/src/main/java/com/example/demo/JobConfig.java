@@ -75,9 +75,11 @@ public class JobConfig {
         return jobs.get("job")
                 .start(retrieveFileStep())
                 .next(fileMapperDecider())
-                .from(fileMapperDecider()).on("yearly").to(yearlyStep())
-                .from(fileMapperDecider()).on("quarterly").to(quarterlyStep())
-                .build()
+                .from(fileMapperDecider())
+                	.on("yearly").to(yearlyStep())
+                .from(fileMapperDecider())
+                	.on("quarterly").to(quarterlyStep())
+                	.build()
                 .build();
     }
 }

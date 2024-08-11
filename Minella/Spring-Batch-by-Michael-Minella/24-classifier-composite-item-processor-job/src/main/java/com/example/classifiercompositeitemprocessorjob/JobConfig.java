@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
+@SuppressWarnings("unchecked")
 @Configuration
 public class JobConfig {
     @Autowired
@@ -61,6 +62,7 @@ public class JobConfig {
 		return itemProcessor;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Bean
 	public Classifier classifier() {
 		return new ZipCodeClassifier(upperCaseItemProcessor(), lowerCaseItemProcessor());

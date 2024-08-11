@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+
+@SuppressWarnings({"unchecked","rawtypes"})
 @SpringBootApplication
 @EnableBatchProcessing
 public class MultiFileJobApplication {
@@ -40,7 +42,7 @@ public class MultiFileJobApplication {
     @Autowired
     private StepBuilderFactory stepBuilderFactory;
 
-    @Bean
+	@Bean
     @StepScope
     public FlatFileItemReader customerItemReader() {
         return new FlatFileItemReaderBuilder<Customer>()
@@ -105,7 +107,8 @@ public class MultiFileJobApplication {
         return (items) -> Objects.requireNonNull(items).forEach(System.out::println);
     }
 
-    @Bean
+    
+	@Bean
     public Step copyFileStep() {
         return this.stepBuilderFactory.get("copyFileStep")
                 .<Customer, Customer>chunk(10)

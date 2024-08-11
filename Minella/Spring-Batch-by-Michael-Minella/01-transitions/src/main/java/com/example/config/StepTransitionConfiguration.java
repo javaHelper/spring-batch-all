@@ -70,9 +70,11 @@ public class StepTransitionConfiguration {
 	public Job transitionJobSimpleNext() {
 		return jobBuilderFactory.get("transitionJobSimpleNext")
 				.start(step1())
-				.on("COMPLETED").to(step2())
-				.from(step2()).on("COMPLETED").to(step3())
-				.from(step3()).end()
+					.on("COMPLETED").to(step2())
+				.from(step2())
+					.on("COMPLETED").to(step3())
+				.from(step3())
+					.end()
 				.build();
 	}
 	

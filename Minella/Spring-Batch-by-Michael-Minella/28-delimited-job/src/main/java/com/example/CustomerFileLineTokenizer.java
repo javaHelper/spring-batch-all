@@ -8,6 +8,10 @@ import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.item.file.transform.FieldSetFactory;
 import org.springframework.batch.item.file.transform.LineTokenizer;
 
+/**
+ * Interface that is used by framework to split string obtained typically from a file into tokens.
+ */
+
 public class CustomerFileLineTokenizer implements LineTokenizer {
 
     private String delimiter = ",";

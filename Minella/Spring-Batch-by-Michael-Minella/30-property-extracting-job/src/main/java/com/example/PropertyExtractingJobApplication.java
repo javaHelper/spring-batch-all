@@ -37,6 +37,7 @@ public class PropertyExtractingJobApplication {
                 .build();
     }
 
+    // Delegates processing to a custom method - extracts property values from item object and uses them as arguments for the delegate method.
     @Bean
     public PropertyExtractingDelegatingItemWriter<Customer> itemWriter(CustomerService customerService) {
         PropertyExtractingDelegatingItemWriter<Customer> itemWriter = new PropertyExtractingDelegatingItemWriter<>();

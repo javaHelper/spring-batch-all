@@ -83,9 +83,12 @@ public class DeciderConditionalApplication {
 	                .start(firstStep())
 	                .next(decider())
 	                    .on("TYPE1").to(stepType1())
-	                    .from(decider()).on("TYPE2").to(stepType2())
-	                    .from(stepType1()).on("*").to(lastStep())
-	                    .from(stepType2()).on("*").to(lastStep())
+	                    .from(decider())
+	                    	.on("TYPE2").to(stepType2())
+	                    .from(stepType1())
+	                    	.on("*").to(lastStep())
+	                    .from(stepType2())
+	                    	.on("*").to(lastStep())
 	                    .build()
 	                .build();
 	    }

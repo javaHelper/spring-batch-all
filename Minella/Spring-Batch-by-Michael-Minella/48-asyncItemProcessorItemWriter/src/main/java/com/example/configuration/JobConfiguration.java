@@ -28,6 +28,8 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import com.example.domain.Customer;
 import com.example.mapper.CustomerRowMapper;
 
+
+@SuppressWarnings({"rawtypes","unchecked"})
 @Configuration
 public class JobConfiguration {
 	@Autowired
@@ -95,7 +97,6 @@ public class JobConfiguration {
 		return asyncItemWriter;  
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Bean
 	public Step step1() throws Exception {
 		return stepBuilderFactory.get("step1")

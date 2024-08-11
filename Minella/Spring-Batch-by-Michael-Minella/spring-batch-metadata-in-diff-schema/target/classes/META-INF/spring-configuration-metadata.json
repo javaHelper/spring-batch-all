@@ -1,0 +1,18 @@
+{
+  "groups": [
+    {
+      "name": "spring.datasource",
+      "type": "javax.sql.DataSource",
+      "sourceType": "com.example.config.DatabaseConfig",
+      "sourceMethod": "public javax.sql.DataSource getSeconadaryBatchDataSource() "
+    },
+    {
+      "name": "spring.hello.datasource",
+      "type": "javax.sql.DataSource",
+      "sourceType": "com.example.config.DatabaseConfig",
+      "sourceMethod": "public javax.sql.DataSource getPrimaryBatchDataSource() "
+    }
+  ],
+  "properties": [],
+  "hints": []
+}

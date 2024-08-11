@@ -62,6 +62,7 @@ public class JobConfiguration {
 		System.out.println(">> Output Path = "+customerOutputPath);
 		
 		FlatFileItemWriter<Customer> itemWriter = new FlatFileItemWriter<>();
+		
 		//A LineAggregator implementation that simply calls Object.toString() on the given object
 		//itemWriter.setLineAggregator(new PassThroughLineAggregator<>());
 		
