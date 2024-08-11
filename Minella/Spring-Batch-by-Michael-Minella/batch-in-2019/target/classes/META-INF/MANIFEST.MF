@@ -1,9 +1,0 @@
-Manifest-Version: 1.0
-Built-By: prateekashtikar
-Build-Jdk: 17.0.1
-Implementation-Title: batch-in-2019
-Implementation-Version: 0.0.1-SNAPSHOT
-Implementation-Vendor-Id: com.example
-Implementation-URL: https://spring.io/projects/spring-boot/batch-in-2019
-Created-By: Maven Integration for Eclipse
-
