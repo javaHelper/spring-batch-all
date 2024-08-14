@@ -22,9 +22,11 @@ public class JobConfiguration {
 	
 	@Bean
 	@StepScope
-	public Tasklet helloWorldTasklet(@Value("#{jobParameters['message']}") String message) {
+	public Tasklet helloWorldTasklet(@Value("#{jobParameters['message']}") String message,
+			@Value("#{jobParameters['message1']}") String message1) {
 		return (stepContribution, chunkContext) -> {
 			System.out.println(message);
+			System.out.println(message1);
 			return RepeatStatus.FINISHED;
 		};
 	}
@@ -32,7 +34,7 @@ public class JobConfiguration {
 	@Bean
 	public Step step1() {
 		return stepBuilderFactory.get("step1")
-				.tasklet(helloWorldTasklet(null))
+				.tasklet(helloWorldTasklet(null, null))
 				.build();
 	}
 	
