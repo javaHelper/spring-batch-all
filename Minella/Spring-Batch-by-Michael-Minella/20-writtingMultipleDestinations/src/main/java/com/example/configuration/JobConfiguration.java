@@ -33,25 +33,25 @@ import com.example.aggregator.CustomLineAggregator;
 import com.example.mapper.CustomerRowMapper;
 import com.example.model.Customer;
 
-
 @Configuration
 public class JobConfiguration {
 	@Autowired
 	private JobBuilderFactory jobBuilderFactory;
-	
+
 	@Autowired
 	private StepBuilderFactory stepBuilderFactory;
-	
+
 	@Autowired
 	private DataSource dataSource;
-	
+
 	@Bean
-	public JdbcPagingItemReader<Customer> customerPagingItemReader(){
+	public JdbcPagingItemReader<Customer> customerPagingItemReader() {
 		// Sort Keys
 		Map<String, Order> sortKeys = new HashMap<>();
 		sortKeys.put("id", Order.ASCENDING);
 
-		// MySQL implementation of a PagingQueryProvider using database specific features.
+		// MySQL implementation of a PagingQueryProvider using database specific
+		// features.
 		MySqlPagingQueryProvider queryProvider = new MySqlPagingQueryProvider();
 		queryProvider.setSelectClause("id, firstName, lastName, birthdate");
 		queryProvider.setFromClause("from customer");
@@ -65,32 +65,31 @@ public class JobConfiguration {
 				.queryProvider(queryProvider)
 				.build();
 	}
-	
-	
+
 	@Bean
-	public FlatFileItemWriter<Customer> jsonItemWriter() throws Exception{
+	public FlatFileItemWriter<Customer> jsonItemWriter() throws Exception {
 		String customerOutputPath = File.createTempFile("customerOutput", ".out").getAbsolutePath();
-		System.out.println(">> Output Path = "+customerOutputPath);
-				
+		System.out.println(">> Output Path = " + customerOutputPath);
+
 		return new FlatFileItemWriterBuilder<Customer>()
 				.name("jsonItemWriter")
 				.lineAggregator(new CustomLineAggregator())
 				.resource(new FileSystemResource(customerOutputPath))
 				.build();
 	}
-	
+
 	@SuppressWarnings("rawtypes")
 	@Bean
-	public StaxEventItemWriter<Customer> xmlItemWriter() throws Exception{
+	public StaxEventItemWriter<Customer> xmlItemWriter() throws Exception {
 		String customerOutputPath = File.createTempFile("customerOutput", ".out").getAbsolutePath();
-		System.out.println(">> Output Path = "+customerOutputPath);
-		
+		System.out.println(">> Output Path = " + customerOutputPath);
+
 		Map<String, Class> aliases = new HashMap<>();
 		aliases.put("customer", Customer.class);
-		
+
 		XStreamMarshaller marshaller = new XStreamMarshaller();
 		marshaller.setAliases(aliases);
-		
+
 		// StAX and Marshaller for serializing object to XML.
 		return new StaxEventItemWriterBuilder<Customer>()
 				.name("xmlItemWriter")
@@ -99,10 +98,9 @@ public class JobConfiguration {
 				.resource(new FileSystemResource(customerOutputPath))
 				.build();
 	}
-	
-	
+
 	@Bean
-	public CompositeItemWriter<Customer> itemWriter() throws Exception{	
+	public CompositeItemWriter<Customer> itemWriter() throws Exception {
 		List<ItemWriter<? super Customer>> writers = new ArrayList<>();
 		writers.add(xmlItemWriter());
 		writers.add(jsonItemWriter());
@@ -111,17 +109,16 @@ public class JobConfiguration {
 				.delegates(writers)
 				.build();
 	}
-	
-	
+
 	@Bean
 	public Step step1() throws Exception {
 		return stepBuilderFactory.get("step1")
-				.<Customer, Customer> chunk(10)
+				.<Customer, Customer>chunk(10)
 				.reader(customerPagingItemReader())
 				.writer(itemWriter())
 				.build();
 	}
-	
+
 	@Bean
 	public Job job() throws Exception {
 		return jobBuilderFactory.get("job")

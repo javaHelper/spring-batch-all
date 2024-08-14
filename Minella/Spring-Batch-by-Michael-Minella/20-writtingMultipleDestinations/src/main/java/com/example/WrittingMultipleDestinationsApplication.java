@@ -15,13 +15,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @EnableBatchProcessing
-public class WrittingMultipleDestinationsApplication implements CommandLineRunner{
+public class WrittingMultipleDestinationsApplication implements CommandLineRunner {
 	@Autowired
 	private JobLauncher jobLauncher;
 
 	@Autowired
 	private Job job;
-	
+
 	public static void main(String[] args) {
 		SpringApplication.run(WrittingMultipleDestinationsApplication.class, args);
 	}
@@ -29,12 +29,11 @@ public class WrittingMultipleDestinationsApplication implements CommandLineRunne
 	@Override
 	public void run(String... args) throws Exception {
 		JobParameters jobParameters = new JobParametersBuilder()
-                .addString("JobId", String.valueOf(System.currentTimeMillis()))
+				.addString("JobId", String.valueOf(System.currentTimeMillis()))
 				.addDate("date", new Date())
-                .addLong("time",System.currentTimeMillis())
-				.toJobParameters();
-		
+				.addLong("time", System.currentTimeMillis()).toJobParameters();
+
 		JobExecution execution = jobLauncher.run(job, jobParameters);
-		System.out.println("STATUS :: "+execution.getStatus());
+		System.out.println("STATUS :: " + execution.getStatus());
 	}
 }
