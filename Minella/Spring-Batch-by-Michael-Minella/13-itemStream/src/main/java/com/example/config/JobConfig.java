@@ -36,7 +36,6 @@ public class JobConfig {
 	@Bean 
 	public ItemWriter<String> itemWriter(){
 		return new ItemWriter<String>() {
-
 			@Override
 			public void write(List<? extends String> items) throws Exception {
 				for (String item : items) {
