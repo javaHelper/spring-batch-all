@@ -10,7 +10,7 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>classifier-composite-item-writer-job</artifactId>
+	<artifactId>22-classifier-composite-item-writer-job</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>databaseOutput</name>
