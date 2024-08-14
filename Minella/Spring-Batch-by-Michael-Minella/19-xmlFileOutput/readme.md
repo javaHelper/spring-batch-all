@@ -81,3 +81,131 @@ xmlfileoutput          | 2023-07-13 08:34:02.967  INFO 1 --- [ionShutdownHook] c
 xmlfileoutput          | 2023-07-13 08:34:03.004  INFO 1 --- [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
 xmlfileoutput exited with code 0
 ```
+
+
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<customers>
+	<customer>
+		<id>1</id>
+		<firstName>John</firstName>
+		<lastName>Doe</lastName>
+		<birthdate>10-10-1952 10:10:10</birthdate>
+	</customer>
+	<customer>
+		<id>2</id>
+		<firstName>Amy</firstName>
+		<lastName>Eugene</lastName>
+		<birthdate>05-07-1985 17:10:00</birthdate>
+	</customer>
+	<customer>
+		<id>3</id>
+		<firstName>Laverne</firstName>
+		<lastName>Mann</lastName>
+		<birthdate>11-12-1988 10:10:10</birthdate>
+	</customer>
+	<customer>
+		<id>4</id>
+		<firstName>Janice</firstName>
+		<lastName>Preston</lastName>
+		<birthdate>19-02-1960 10:10:10</birthdate>
+	</customer>
+	<customer>
+		<id>5</id>
+		<firstName>Pauline</firstName>
+		<lastName>Rios</lastName>
+		<birthdate>29-08-1977 10:10:10</birthdate>
+	</customer>
+	<customer>
+		<id>6</id>
+		<firstName>Perry</firstName>
+		<lastName>Burnside</lastName>
+		<birthdate>10-03-1981 10:10:10</birthdate>
+	</customer>
+	<customer>
+		<id>7</id>
+		<firstName>Todd</firstName>
+		<lastName>Kinsey</lastName>
+		<birthdate>14-12-1998 10:10:10</birthdate>
+	</customer>
+	<customer>
+		<id>8</id>
+		<firstName>Jacqueline</firstName>
+		<lastName>Hyde</lastName>
+		<birthdate>20-03-1983 10:10:10</birthdate>
+	</customer>
+	<customer>
+		<id>9</id>
+		<firstName>Rico</firstName>
+		<lastName>Hale</lastName>
+		<birthdate>10-10-2000 10:10:10</birthdate>
+	</customer>
+	<customer>
+		<id>10</id>
+		<firstName>Samuel</firstName>
+		<lastName>Lamm</lastName>
+		<birthdate>11-11-1999 10:10:10</birthdate>
+	</customer>
+	<customer>
+		<id>11</id>
+		<firstName>Robert</firstName>
+		<lastName>Coster</lastName>
+		<birthdate>10-10-1972 10:10:10</birthdate>
+	</customer>
+	<customer>
+		<id>12</id>
+		<firstName>Tamara</firstName>
+		<lastName>Soler</lastName>
+		<birthdate>02-01-1978 10:10:10</birthdate>
+	</customer>
+	<customer>
+		<id>13</id>
+		<firstName>Justin</firstName>
+		<lastName>Kramer</lastName>
+		<birthdate>19-11-1951 10:10:10</birthdate>
+	</customer>
+	<customer>
+		<id>14</id>
+		<firstName>Andrea</firstName>
+		<lastName>Law</lastName>
+		<birthdate>14-10-1959 10:10:10</birthdate>
+	</customer>
+	<customer>
+		<id>15</id>
+		<firstName>Laura</firstName>
+		<lastName>Porter</lastName>
+		<birthdate>12-12-2010 10:10:10</birthdate>
+	</customer>
+	<customer>
+		<id>16</id>
+		<firstName>Michael</firstName>
+		<lastName>Cantu</lastName>
+		<birthdate>11-04-1999 10:10:10</birthdate>
+	</customer>
+	<customer>
+		<id>17</id>
+		<firstName>Andrew</firstName>
+		<lastName>Thomas</lastName>
+		<birthdate>04-05-1967 10:10:10</birthdate>
+	</customer>
+	<customer>
+		<id>18</id>
+		<firstName>Jose</firstName>
+		<lastName>Hannah</lastName>
+		<birthdate>16-09-1950 10:10:10</birthdate>
+	</customer>
+	<customer>
+		<id>19</id>
+		<firstName>Valerie</firstName>
+		<lastName>Hilbert</lastName>
+		<birthdate>13-06-1966 10:10:10</birthdate>
+	</customer>
+	<customer>
+		<id>20</id>
+		<firstName>Patrick</firstName>
+		<lastName>Durham</lastName>
+		<birthdate>12-10-1978 10:10:10</birthdate>
+	</customer>
+</customers>
+```
