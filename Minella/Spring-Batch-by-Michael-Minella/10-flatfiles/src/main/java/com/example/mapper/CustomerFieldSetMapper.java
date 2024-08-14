@@ -9,6 +9,9 @@ import org.springframework.validation.BindException;
 
 import com.example.domain.Customer;
 
+/**
+ * Interface that is used to map data obtained from a FieldSet into an object.
+ */
 public class CustomerFieldSetMapper implements FieldSetMapper<Customer> {
 	private static final DateTimeFormatter DT_FORMAT = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
 	
