@@ -5,6 +5,9 @@ import java.util.List;
 
 import org.springframework.batch.item.ItemReader;
 
+/**
+ * Strategy interface for providing the data.
+ */
 public class StatelessItemReader implements ItemReader<String> {
 
 	private final Iterator<String> data;
