@@ -14,15 +14,11 @@ public class CustomerRowMapper implements RowMapper<Customer> {
 
 	@Override
 	public Customer mapRow(ResultSet rs, int rowNum) throws SQLException {
-		//@// @formatter:off
 		return Customer.builder()
 				.id(rs.getLong("id"))
 				.firstName(rs.getString("firstName"))
 				.lastName(rs.getString("lastName"))
 				.birthdate(LocalDateTime.parse(rs.getString("birthdate"), DT_FORMAT))
 				.build(); 
-		// @formatter:on
-
-
 	}
 }
