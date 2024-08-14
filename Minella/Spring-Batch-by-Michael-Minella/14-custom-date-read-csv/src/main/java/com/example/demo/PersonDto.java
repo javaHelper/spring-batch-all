@@ -1,5 +1,7 @@
 package com.example.demo;
 
+import java.time.LocalDate;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,5 +15,5 @@ public class PersonDto {
     private String id;
     private String firstName;
     private String lastName;
-    private String dob;
+    private LocalDate dob;
 }
