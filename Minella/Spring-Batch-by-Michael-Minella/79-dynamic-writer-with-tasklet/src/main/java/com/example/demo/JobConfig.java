@@ -22,14 +22,22 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import javax.sql.DataSource;
 import java.util.Map;
 
+
+@SuppressWarnings({ "unchecked", "rawtypes" })
 @Configuration
 public class JobConfig {
     @Autowired
     private StepBuilderFactory stepBuilderFactory;
+    
+    @Autowired
+    private JobBuilderFactory jobBuilderFactory;
+    
     @Autowired
     private DataSource dataSource;
+    
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    
     @Autowired
     private ConfigurableApplicationContext applicationContext;
 
@@ -50,11 +58,13 @@ public class JobConfig {
                 .build();
     }
 
-    @Bean
+    
+	@Bean
     @StepScope
     public ClassifierCompositeItemWriter<Student> itemWriter() {
         // dynamically get writers from the application context and register them as delegates in the composite
         Map<String, FlatFileItemWriter> beansOfType = applicationContext.getBeansOfType(FlatFileItemWriter.class);
+        
         // Classify students by group
         Classifier<Student, FlatFileItemWriter<Student>> classifier = student -> beansOfType.get("group" + student.getGroupId() + "Writer");
 
@@ -81,8 +91,7 @@ public class JobConfig {
     }
 
     @Bean
-    public Job job(JdbcTemplate jdbcTemplate, ConfigurableApplicationContext applicationContext, DataSource dataSource,
-                   JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory) {
+    public Job job(JdbcTemplate jdbcTemplate, ConfigurableApplicationContext applicationContext) {
         return jobBuilderFactory.get("job")
                 .start(step1())
                 .next(step2())
