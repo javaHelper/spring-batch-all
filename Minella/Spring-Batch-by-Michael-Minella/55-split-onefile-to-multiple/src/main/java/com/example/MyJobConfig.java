@@ -37,21 +37,27 @@ public class MyJobConfig {
     }
 	
 	@Bean
-    public ItemWriter<String> itemWriter() {
-        final FlatFileItemWriter<String> writer = new FlatFileItemWriter<>();
-        writer.setLineAggregator(new PassThroughLineAggregator<>());
-        writer.setName("chunkFileItemWriter");
-        
-        return new ItemWriter<String>() {
-            @Override
-            public void write(List<? extends String> items) throws Exception {
-                writer.setResource(new FileSystemResource("foos-" + MyJobConfig.this.getTimestamp() + ".txt"));
-                writer.open(new ExecutionContext());
-                writer.write(items);
-                writer.close();
-            }
-        };
-    }
+	public ItemWriter<String> itemWriter(){
+		return new MyWriter();
+	}
+	
+	// Alternate way
+//	@Bean
+//    public ItemWriter<String> itemWriter() {
+//        final FlatFileItemWriter<String> writer = new FlatFileItemWriter<>();
+//        writer.setLineAggregator(new PassThroughLineAggregator<>());
+//        writer.setName("chunkFileItemWriter");
+//        
+//        return new ItemWriter<String>() {
+//            @Override
+//            public void write(List<? extends String> items) throws Exception {
+//                writer.setResource(new FileSystemResource("foos-" + MyJobConfig.this.getTimestamp() + ".txt"));
+//                writer.open(new ExecutionContext());
+//                writer.write(items);
+//                writer.close();
+//            }
+//        };
+//    }
 
     private String getTimestamp() {
         // TODO tested on unix/linux systems, update as needed to not contain illegal characters for a file name on MS windows
