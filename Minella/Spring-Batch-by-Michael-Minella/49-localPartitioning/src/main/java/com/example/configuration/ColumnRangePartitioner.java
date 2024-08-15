@@ -10,6 +10,11 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+/**
+ * Central strategy interface for creating input parameters for a partitioned step in the form of ExecutionContext instances. 
+ * The usual aim is to create a set of distinct input values, e.g. a set of non-overlapping primary key ranges, or a set of unique 
+ * filenames.
+ */
 public class ColumnRangePartitioner implements Partitioner {
 	private JdbcOperations jdbcTemplate;
 	private String table;
