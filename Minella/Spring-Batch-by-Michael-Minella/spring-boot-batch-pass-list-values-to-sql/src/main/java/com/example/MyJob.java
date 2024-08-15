@@ -37,7 +37,7 @@ public class MyJob {
 			private static final long serialVersionUID = 1L;
 
 		{
-			put("value", Arrays.asList(2, 3));
+			put("value", Arrays.asList(2, 3, 4,5));
 		}};
 
 		ParsedSql parsedSql = NamedParameterUtils.parseSqlStatement(sql);
