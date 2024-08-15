@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Bean;
 @EnableBatchProcessing
 public class SystemCommandJobApplication {
 	@Autowired
-	private JobBuilderFactory	 jobBuilderFactory;
+	private JobBuilderFactory jobBuilderFactory;
 
 	@Autowired
 	private StepBuilderFactory stepBuilderFactory;
