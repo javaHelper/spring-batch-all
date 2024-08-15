@@ -28,6 +28,7 @@ import java.util.Map;
 
 @SpringBootApplication
 @EnableBatchProcessing
+@SuppressWarnings({"rawtypes","unchecked"})
 public class MultiFormatJobApplication {
     @Autowired
     private JobBuilderFactory jobBuilderFactory;
@@ -35,7 +36,8 @@ public class MultiFormatJobApplication {
     @Autowired
     private StepBuilderFactory stepBuilderFactory;
 
-    @Bean
+    
+	@Bean
     @StepScope
     public FlatFileItemReader customerItemReader(@Value("#{jobParameters['customerFile']}") Resource inputFile) {
         return new FlatFileItemReaderBuilder<Customer>()
