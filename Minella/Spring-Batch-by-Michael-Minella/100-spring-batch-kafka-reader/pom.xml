@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>spring-batch-kafka-reader</artifactId>
+	<artifactId>100-spring-batch-kafka-reader</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>spring-batch-kafka-reader</name>
 	<description>Demo project for Spring Boot</description>

@@ -10,7 +10,7 @@
 	</parent>
 	
 	<groupId>com.example</groupId>
-	<artifactId>spring-batch-kafka-writer</artifactId>
+	<artifactId>101-spring-batch-kafka-writer</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>spring-batch-kafka-writer</name>
 	<description>Demo project for Spring Boot</description>

@@ -9,7 +9,7 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>spring-boot-jdbcBatchUpdate</artifactId>
+	<artifactId>102-spring-boot-jdbcBatchUpdate</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>spring-batch-metadata-in-diff-schema</name>
 	<description>Demo project for Spring Boot</description>
