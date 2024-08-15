@@ -44,6 +44,7 @@ public class MyConfig {
 	public ItemProcessor<Person, Person> itemProcessor() {
 		return new ItemProcessor<Person, Person>() {
 
+			@SuppressWarnings("deprecation")
 			@Override
 			public Person process(Person person) {
 				Address address = jdbcTemplate.queryForObject(READ_SQL, new Object[]{person.getId()}, 
