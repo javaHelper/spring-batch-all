@@ -8,12 +8,12 @@ public class MyStepListener implements StepExecutionListener {
 
     @Override
     public void beforeStep(StepExecution stepExecution) {
-        System.out.println("beforeStep");
+        System.out.println("===== beforeStep");
     }
 
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
-        System.out.println("afterStep");
+        System.out.println("===== afterStep");
         return ExitStatus.COMPLETED;
     }
 }

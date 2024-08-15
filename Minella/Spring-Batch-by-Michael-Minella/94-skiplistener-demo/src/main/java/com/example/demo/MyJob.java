@@ -12,9 +12,6 @@ import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.core.JdbcTemplate;
-
-import javax.sql.DataSource;
 
 @Configuration
 public class MyJob {
@@ -36,6 +33,9 @@ public class MyJob {
             for (Integer item : items) {
                 if (item.equals(1)) {
                     throw new Exception("No 1 here!");
+                }
+                if (item.equals(3)) {
+                    throw new Exception("No 3 here!");
                 }
                 System.out.println("item = " + item);
             }
