@@ -3,9 +3,7 @@ package com.example.rowmapper;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 import org.springframework.jdbc.core.RowMapper;
@@ -29,9 +27,6 @@ public class PaymentRowMapper implements RowMapper<Payment>{
     }
 
 	private LocalDate getPaymentDate(Date paymentDate) {
-		Instant instant = Instant.ofEpochMilli(paymentDate.getTime()); 
-		LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault()); 
-		LocalDate localDate = localDateTime.toLocalDate();
-		return localDate;
+		return paymentDate.toLocalDate();
 	}
 }

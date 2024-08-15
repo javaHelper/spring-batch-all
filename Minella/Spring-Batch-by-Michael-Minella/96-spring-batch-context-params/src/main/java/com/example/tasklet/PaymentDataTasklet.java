@@ -3,9 +3,7 @@ package com.example.tasklet;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 
@@ -42,9 +40,6 @@ public class PaymentDataTasklet implements Tasklet{
     }
 
 	private LocalDate getPaymentDate(Date paymentDate) {
-		Instant instant = Instant.ofEpochMilli(paymentDate.getTime()); 
-		LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault()); 
-		LocalDate localDate = localDateTime.toLocalDate();
-		return localDate;
+		return paymentDate.toLocalDate();
 	}
 }
