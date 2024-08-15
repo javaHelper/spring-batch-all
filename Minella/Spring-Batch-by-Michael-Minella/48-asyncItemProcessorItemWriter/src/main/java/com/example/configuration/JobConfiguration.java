@@ -66,8 +66,12 @@ public class JobConfiguration {
 	public ItemProcessor itemProcessor(){
 		return (ItemProcessor<Customer, Customer>) item -> {
 			Thread.sleep(new Random().nextInt(10));
-			return Customer.builder().id(item.getId()).firstName(item.getFirstName())
-					.lastName(item.getLastName()).birthdate(item.getBirthdate()).build();
+			return Customer.builder()
+					.id(item.getId())
+					.firstName(item.getFirstName())
+					.lastName(item.getLastName())
+					.birthdate(item.getBirthdate())
+					.build();
 		};
 	}
 	
