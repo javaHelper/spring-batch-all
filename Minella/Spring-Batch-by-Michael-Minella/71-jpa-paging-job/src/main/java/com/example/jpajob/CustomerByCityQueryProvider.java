@@ -6,6 +6,9 @@ import org.springframework.util.Assert;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+/**
+ * Abstract JPA Query Provider to serve as a base class for all JPA Query providers.
+ */
 public class CustomerByCityQueryProvider extends AbstractJpaQueryProvider {
     private String cityName;
 
