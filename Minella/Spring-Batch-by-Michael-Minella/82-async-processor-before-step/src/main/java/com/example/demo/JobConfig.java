@@ -1,7 +1,9 @@
 package com.example.demo;
 
+import java.util.Arrays;
+import java.util.concurrent.Future;
+
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
@@ -16,15 +18,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
-import java.util.Arrays;
-import java.util.concurrent.Future;
-
 @Configuration
 public class JobConfig {
     @Autowired
-    private StepBuilderFactory stepBuilderFactory;
+    private StepBuilderFactory steps;
     @Autowired
-    private JobBuilderFactory jobBuilderFactory;
+    private JobBuilderFactory jobs;
 
     @Bean
     public ItemReader<Integer> itemReader() {
@@ -61,13 +60,13 @@ public class JobConfig {
     }
 
     @Bean
-    public Job job(JobBuilderFactory jobs, StepBuilderFactory steps) {
+    public Job job() {
         return jobs.get("myJob")
-                .start(getMyStep(steps))
+                .start(getMyStep())
                 .build();
     }
 
-    private TaskletStep getMyStep(StepBuilderFactory steps) {
+    private TaskletStep getMyStep() {
         return steps.get("myStep")
                 .<Integer, Future<Integer>>chunk(5)
                 .reader(itemReader())
