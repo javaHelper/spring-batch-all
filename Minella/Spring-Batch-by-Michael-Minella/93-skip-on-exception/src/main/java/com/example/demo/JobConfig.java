@@ -59,6 +59,7 @@ public class JobConfig {
                 .writer(itemWriter())
                 .faultTolerant()
                 .skip(IllegalArgumentException.class)
+                .skip(NullPointerException.class)
                 .skipLimit(3)
                 .build();
     }
