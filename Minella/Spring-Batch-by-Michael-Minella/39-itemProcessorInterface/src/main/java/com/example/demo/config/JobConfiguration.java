@@ -55,6 +55,7 @@ public class JobConfiguration {
 		return reader;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Bean
 	public StaxEventItemWriter<Customer> customerItemWriter() throws Exception {
 		XStreamMarshaller marshaller = new XStreamMarshaller();
