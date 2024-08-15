@@ -27,7 +27,7 @@ import org.springframework.scheduling.support.PeriodicTrigger;
 
 import com.example.demo.model.Customer;
 
-
+@SuppressWarnings({"rawtypes","unchecked"})
 @Configuration
 public class IntegrationConfiguration {
 
@@ -36,6 +36,7 @@ public class IntegrationConfiguration {
 
 	@Bean
 	public ChunkHandler chunkHandler(TaskletStep step1) throws Exception {
+		
 		RemoteChunkHandlerFactoryBean factoryBean = new RemoteChunkHandlerFactoryBean();
 
 		factoryBean.setChunkWriter(chunkWriter());
