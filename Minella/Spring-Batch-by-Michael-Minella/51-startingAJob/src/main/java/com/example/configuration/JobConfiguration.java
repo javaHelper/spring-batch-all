@@ -22,6 +22,12 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
+
+/**
+ * Interface to be implemented by any object that wishes to be notified of the ApplicationContext that it runs in.
+ *  Implementing this interface makes sense for example when an object requires access to a set of collaborating beans. 
+ *  Note that configuration via bean references is preferable to implementing this interface just for bean lookup purposes.
+ */
 @Component
 public class JobConfiguration implements ApplicationContextAware{
 
