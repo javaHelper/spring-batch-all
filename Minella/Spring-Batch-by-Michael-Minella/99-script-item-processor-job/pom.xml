@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>script-item-processor-job</artifactId>
+	<artifactId>99-script-item-processor-job</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>script-item-processor-job</name>
 	<description>Demo project for Spring Boot</description>
