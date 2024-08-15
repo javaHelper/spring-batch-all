@@ -8,12 +8,13 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.PreparedStatementCreatorFactory;
@@ -26,13 +27,19 @@ import org.springframework.jdbc.core.namedparam.ParsedSql;
 import lombok.extern.slf4j.Slf4j;
 
 @Configuration
-@EnableBatchProcessing
 @Slf4j
 public class MyJob {
+	
+	@Autowired
+	private JobBuilderFactory jobBuilderFactory;
+	@Autowired
+	private StepBuilderFactory stepBuilderFactory;
+	@Autowired
+	private DataSource dataSource;
 
 	@Bean
-	public JdbcCursorItemReader<Person> itemReader(DataSource dataSource) {
-		String sql = "select * from person where id in (:value)";
+	public JdbcCursorItemReader<Person> itemReader() {
+		String sql = "select * from test.person where id in (:value)";
 		Map<String, Object> namedParameters = new HashMap<>() {
 			private static final long serialVersionUID = 1L;
 
@@ -73,14 +80,20 @@ public class MyJob {
 		};
 	}
 
+	
 	@Bean
-	public Job job(JobBuilderFactory jobs, StepBuilderFactory steps, DataSource dataSource) {
-		return jobs.get("job")
-				.start(steps.get("step")
-						.<Person, Person>chunk(5)
-						.reader(itemReader(dataSource))
-						.writer(itemWriter())
-						.build())
+	public Step step1() {
+		return stepBuilderFactory.get("step1")
+				.<Person, Person>chunk(5)
+				.reader(itemReader())
+				.writer(itemWriter())
+				.build();
+	}
+	
+	@Bean
+	public Job job() {
+		return jobBuilderFactory.get("job")
+				.start(step1())
 				.build();
 	}
 }
