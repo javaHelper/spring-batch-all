@@ -29,7 +29,12 @@ public class EmpoloyeeJob {
 	@Bean
 	public JdbcCursorItemReader<Employee> itemReader(DataSource dataSource) {
 		String sql = "select * from employee where age = :age and firstName = :firstName";
-		Map<String, Object> namedParameters = new HashMap<String, Object>() {{
+		Map<String, Object> namedParameters = new HashMap<String, Object>() {/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+		{
 			put("age", 22);
 			put("firstName", "John");
 		}};

@@ -5,11 +5,11 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.1</version>
+        <version>2.7.15</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.example</groupId>
-    <artifactId>spring-batch-pass-list-to-sql</artifactId>
+    <artifactId>75-spring-batch-pass-list-to-sql</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>spring-batch-pass-list-to-sql</name>
     <description>Demo project for Spring Boot</description>
@@ -28,8 +28,8 @@
             <artifactId>spring-oxm</artifactId>
         </dependency>
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
         </dependency>
         <dependency>
             <groupId>com.github.javafaker</groupId>
