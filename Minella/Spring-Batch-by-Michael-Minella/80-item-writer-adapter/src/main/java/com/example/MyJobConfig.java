@@ -1,6 +1,7 @@
 package com.example;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -16,7 +17,8 @@ public class MyJobConfig {
 
 	@Bean
     public ItemReader<User> itemReader() {
-        return new ListItemReader<>(Arrays.asList(new User("foo"), new User("bar")));
+		List<User> users = Arrays.asList(new User("foo"), new User("bar"));
+        return new ListItemReader<>(users);
     }
 	
 	@Bean
