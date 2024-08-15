@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>s</artifactId>
+	<artifactId>103-classifier-composite-item-writer-with-Multiresource</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>read-flatfile-write-to-multiple-using-MultiResource-compositeWriter</name>
 	<description>Demo project for Spring Boot</description>
