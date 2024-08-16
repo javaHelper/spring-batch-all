@@ -1,3 +1,13 @@
+# Partitioning in Flat File
+
+
+```curl
+curl --location --request POST 'http://localhost:9191/jobs/importCustomers'
+```
+
+Code:
+
+```java
 package com.example.demo.config;
 
 import com.example.demo.entity.Customer;
@@ -79,8 +89,8 @@ public class JobConfig {
 
     @Bean
     public Step masterStep() {
-        return stepBuilderFactory.get("masterSTep").
-                partitioner(slaveStep().getName(), partitioner())
+        return stepBuilderFactory.get("masterSTep")
+        		.partitioner(slaveStep().getName(), partitioner())
                 .partitionHandler(partitionHandler())
                 .build();
     }
@@ -88,7 +98,9 @@ public class JobConfig {
     @Bean
     public Job runJob() {
         return jobBuilderFactory.get("importCustomers")
-                .flow(masterStep()).end().build();
+                .flow(masterStep())
+                .end()
+                .build();
 
     }
 
@@ -101,3 +113,5 @@ public class JobConfig {
         return taskExecutor;
     }
 }
+
+```
