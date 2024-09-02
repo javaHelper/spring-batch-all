@@ -1,0 +1,134 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:batch="http://www.springframework.org/schema/batch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch-3.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+	<!-- JobRepository and JobLauncher are configuration/setup classes -->
+	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean" />
+
+	<bean id="jobLauncher" 	class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository" />
+	</bean>
+	
+	<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+
+	<bean id="suffixCreator" class="com.example.EmployeeResourceSuffixCreator" />
+	
+	<batch:job id="employeeJob">
+		<batch:step id="step1">
+			<batch:tasklet transaction-manager="transactionManager">
+				<batch:chunk reader="flatFileItemReader" writer="classifierCompositeWriter" commit-interval="0">
+					<batch:streams>
+						<batch:stream ref="javaMultiResource" />
+						<batch:stream ref="pythonMultiResource" />
+						<batch:stream ref="cloudMultiResource" />
+					</batch:streams>
+				</batch:chunk>
+			</batch:tasklet>
+		</batch:step>
+	</batch:job>
+	
+	
+	
+	<bean id="flatFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader" scope="step">
+		<property name="resource" value="classpath:employee.csv" />
+		<property name = "lineMapper"> 
+         <bean class = "org.springframework.batch.item.file.mapping.DefaultLineMapper">
+            <property name = "lineTokenizer"> 
+               <bean class = "org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+                  <property name = "names" value = "empId,firstName,lastName,role" /> 
+               </bean> 
+            </property>
+            <property name = "fieldSetMapper"> 
+               <bean class = "com.example.EmployeeFieldSetMapper" /> 
+            </property> 
+         </bean> 
+      </property>
+	</bean>
+	
+	<bean id="classifierCompositeWriter" class="org.springframework.batch.item.support.ClassifierCompositeItemWriter">
+		<property name="classifier" ref="employeeClassifier" />
+	</bean>
+	
+	<bean id="employeeClassifier" class="com.example.EmployeeClassifier">
+		<constructor-arg index="0" ref="javaMultiResource" />
+		<constructor-arg index="1" ref="pythonMultiResource" />
+		<constructor-arg index="2" ref="cloudMultiResource" />
+	</bean>
+	
+	
+	<bean id="javaWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
+		<property name="resource" value="file:javaDeveloper-employee.csv" />
+		<property name="shouldDeleteIfExists" value="true" />
+		<property name="shouldDeleteIfEmpty" value="false" />
+		<property name="lineAggregator">
+			<bean class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
+				<property name="delimiter" value="," />
+				<property name="fieldExtractor">
+					<bean class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
+						<property name="names" value="empId,firstName,lastName,role" />
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="javaMultiResource" class="org.springframework.batch.item.file.MultiResourceItemWriter">
+		<property name="name" value="javaMulti" />
+		<property name="resource" value="file:javaDeveloper-employee.csv" />
+		<property name="itemCountLimitPerResource" value="5" />
+		<property name="resourceSuffixCreator" ref="suffixCreator"/>
+		<property name="delegate" ref="javaWriter" />
+	</bean>
+
+
+	<bean id="pythonWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
+		<property name="resource" value="file:pythonDeveloper-employee.csv" />
+		<property name="shouldDeleteIfExists" value="true" />
+		<property name="shouldDeleteIfEmpty" value="false" />
+		<property name="lineAggregator">
+			<bean class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
+				<property name="delimiter" value="," />
+				<property name="fieldExtractor">
+					<bean class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
+						<property name="names" value="empId,firstName,lastName,role" />
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="pythonMultiResource" class="org.springframework.batch.item.file.MultiResourceItemWriter">
+		<property name="name" value="javaMulti" />
+		<property name="resource" value="file:pythonDeveloper-employee.csv" />
+		<property name="itemCountLimitPerResource" value="5" />
+		<property name="resourceSuffixCreator" ref="suffixCreator"/>
+		<property name="delegate" ref="pythonWriter" />
+	</bean>
+
+
+
+	<bean id="cloudWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
+		<property name="resource" value="file:cloudDeveloper-employee.csv" />
+		<property name="shouldDeleteIfExists" value="true" />
+		<property name="shouldDeleteIfEmpty" value="false" />
+		<property name="lineAggregator">
+			<bean class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
+				<property name="delimiter" value="," />
+				<property name="fieldExtractor">
+					<bean class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
+						<property name="names" value="empId,firstName,lastName,role" />
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="cloudMultiResource" class="org.springframework.batch.item.file.MultiResourceItemWriter">
+		<property name="name" value="javaMulti" />
+		<property name="resource" value="file:cloudDeveloper-employee.csv" />
+		<property name="itemCountLimitPerResource" value="5" />
+		<property name="resourceSuffixCreator" ref="suffixCreator"/>
+		<property name="delegate" ref="cloudWriter" />
+	</bean>
+</beans>	
