@@ -1,5 +1,6 @@
 #
 
+https://stackoverflow.com/questions/52408082/pass-spring-batch-tasklet-failure-message-to-reporting-step/52411696#52411696
 
 ```java
 package com.example.demo;
