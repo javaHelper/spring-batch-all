@@ -4,47 +4,50 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.example.decider.OddDecider;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 public class JobConfiguration {
 	@Autowired
-	private JobBuilderFactory jobBuilderFactory;
-
+	private JobRepository jobRepository;
 	@Autowired
-	private StepBuilderFactory stepBuilderFactory;
-	
+	private PlatformTransactionManager transactionManager;
+
 	@Bean
 	public Step startStep() {
-		return stepBuilderFactory.get("startStep")
+		return new StepBuilder("startStep", jobRepository)
 				.tasklet((contribution, chunkContext) -> {
 					System.out.println("This is the start Tasklet");
 					return RepeatStatus.FINISHED;
-				}).build();
+				}, transactionManager).build();
 	}
 	
 	@Bean
 	public Step evenStep() {
-		return stepBuilderFactory.get("evenStep")
+		return new StepBuilder("evenStep", jobRepository)
 				.tasklet((contribution, chunkContext) -> {
 					System.out.println("This is the even Tasklet");
 					return RepeatStatus.FINISHED;
-				}).build();
+				},transactionManager).build();
 	}
 	
 	@Bean
 	public Step oddStep() {
-		return stepBuilderFactory.get("oddStep")
+		return new StepBuilder("oddStep", jobRepository)
 				.tasklet((contribution, chunkContext) -> {
 					System.out.println("This is the odd Tasklet");
 					return RepeatStatus.FINISHED;
-				}).build();
+				}, transactionManager).build();
 	}
 	
 	@Bean
@@ -54,7 +57,7 @@ public class JobConfiguration {
 	
 	@Bean
 	public Job job() {
-		return jobBuilderFactory.get("job")
+		return new JobBuilder("job", jobRepository)
 				.start(startStep())
 				.next(decider())
 				.from(decider())
