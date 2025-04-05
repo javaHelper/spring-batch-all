@@ -1,24 +1,26 @@
 package com.example.demo;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.PlatformTransactionManager;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 public class JobConfiguration {
 
 	@Autowired
-	public JobBuilderFactory jobBuilderFactory;
+	public JobRepository jobRepository;
 
 	@Autowired
-	public StepBuilderFactory stepBuilderFactory;
+	public PlatformTransactionManager manager;
 
 	@Bean
 	public StatelessItemReader statelessItemReader() {
@@ -31,8 +33,8 @@ public class JobConfiguration {
 
 	@Bean
 	public Step step1() {
-		return stepBuilderFactory.get("step1")
-				.<String, String>chunk(2)
+		return new StepBuilder("step1", jobRepository)
+				.<String, String>chunk(2, manager)
 				.reader(statelessItemReader())
 				.writer(list -> {
 					for (String curItem : list) {
@@ -43,7 +45,7 @@ public class JobConfiguration {
 
 	@Bean
 	public Job interfacesJob() {
-		return jobBuilderFactory.get("interfacesJob")
+		return new JobBuilder("interfacesJob", jobRepository)
 				.start(step1())
 				.build();
 	}

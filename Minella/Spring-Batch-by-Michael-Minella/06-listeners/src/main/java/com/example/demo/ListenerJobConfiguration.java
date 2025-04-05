@@ -1,28 +1,30 @@
 package com.example.demo;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.PlatformTransactionManager;
+
+import java.util.Arrays;
 
 
 @Configuration
 public class ListenerJobConfiguration {
 
 	@Autowired
-	private JobBuilderFactory jobBuilderFactory;
+	private JobRepository jobRepository;
 
 	@Autowired
-	private StepBuilderFactory stepBuilderFactory;
+	private PlatformTransactionManager manager;
 
 	@Bean
 	public ItemReader<String> reader() {
@@ -33,8 +35,8 @@ public class ListenerJobConfiguration {
 	public ItemWriter<String> writer() {
 		return new ItemWriter<String>() {
 			@Override
-			public void write(List<? extends String> items) throws Exception {
-				for (String item : items) {
+			public void write(Chunk<? extends String> chunk) throws Exception {
+				for (String item : chunk) {
 					System.out.println("Writing item " + item);
 				}
 			}
@@ -43,8 +45,8 @@ public class ListenerJobConfiguration {
 
 	@Bean
 	public Step step1() {
-		return stepBuilderFactory.get("step1")
-				.<String, String>chunk(2)
+		return new StepBuilder("step1", jobRepository)
+				.<String, String>chunk(2, manager)
 				.faultTolerant()
 				.listener(new ChunkListener())
 				.reader(reader())
@@ -54,7 +56,7 @@ public class ListenerJobConfiguration {
 
 	@Bean
 	public Job listenerJob() {
-		return jobBuilderFactory.get("listenerJob")
+		return new JobBuilder("listenerJob", jobRepository)
 				.start(step1())
 				.listener(new JobListener())
 				.build();

@@ -2,45 +2,48 @@ package com.example.configuration;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 public class JobConfiguration {
 	@Autowired
-	private JobBuilderFactory jobBuilderFactory;
-	
+	private JobRepository jobRepository;
+
 	@Autowired
-	private StepBuilderFactory stepBuilderFactory;
-	
+	private PlatformTransactionManager manager;
+
 	@Bean
 	@StepScope
 	public Tasklet helloWorldTasklet(@Value("#{jobParameters['message']}") String message,
-			@Value("#{jobParameters['message1']}") String message1) {
+									 @Value("#{jobParameters['message1']}") String message1) {
+
 		return (stepContribution, chunkContext) -> {
 			System.out.println(message);
 			System.out.println(message1);
 			return RepeatStatus.FINISHED;
 		};
 	}
-	
+
 	@Bean
 	public Step step1() {
-		return stepBuilderFactory.get("step1")
-				.tasklet(helloWorldTasklet(null, null))
+		return new StepBuilder("step1", jobRepository)
+				.tasklet(helloWorldTasklet(null, null), manager)
 				.build();
 	}
-	
+
 	@Bean
 	public Job jobParametersJob() {
-		return jobBuilderFactory.get("jobParametersJob")
+		return new JobBuilder("jobParametersJob", jobRepository)
 				.start(step1())
 				.build();
 	}
