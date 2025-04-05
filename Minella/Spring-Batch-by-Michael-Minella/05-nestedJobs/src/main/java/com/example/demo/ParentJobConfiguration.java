@@ -2,8 +2,7 @@ package com.example.demo;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.JobStepBuilder;
@@ -18,10 +17,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class ParentJobConfiguration {
 
 	@Autowired
-	private JobBuilderFactory jobBuilderFactory;
-
+	private JobRepository jobRepository;
 	@Autowired
-	private StepBuilderFactory stepBuilderFactory;
+	private PlatformTransactionManager transactionManager;
 
 	@Autowired
 	private Job childJob;
@@ -31,26 +29,23 @@ public class ParentJobConfiguration {
 
 	@Bean
 	public Step step1() {
-		return stepBuilderFactory.get("step1")
+		return new StepBuilder("step1", jobRepository)
 				.tasklet((contribution, chunkContext) -> {
 					System.out.println(">> This is step 1");
 					return RepeatStatus.FINISHED;
-				}).build();
+				}, transactionManager).build();
 	}
 
 	@Bean
 	public Job parentJob(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-		Step childJobStep = new JobStepBuilder(new StepBuilder("childJobStep"))
+		Step childJobStep = new JobStepBuilder(new StepBuilder("childJobStep", jobRepository))
 				.job(childJob)
 				.launcher(jobLauncher)
-				.repository(jobRepository)
-				.transactionManager(transactionManager)
 				.build();
 
-		return jobBuilderFactory.get("parentJob")
+		return new JobBuilder("parentJob", jobRepository)
 				.start(step1())
 				.next(childJobStep)
 				.build();
 	}
 }
-
