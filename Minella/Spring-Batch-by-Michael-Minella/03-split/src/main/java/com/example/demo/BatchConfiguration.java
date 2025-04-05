@@ -2,26 +2,27 @@ package com.example.demo;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.job.builder.FlowBuilder;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.job.flow.Flow;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 public class BatchConfiguration {
-
 	@Autowired
-	private JobBuilderFactory jobBuilderFactory;
-
+	private JobRepository jobRepository;
 	@Autowired
-	private StepBuilderFactory stepBuilderFactory;
+	private PlatformTransactionManager ptm;
+
 
 	@Bean
 	public Tasklet tasklet() {
@@ -31,24 +32,24 @@ public class BatchConfiguration {
 	@Bean
 	public Flow flow1() {
 		return new FlowBuilder<Flow>("flow1")
-				.start(stepBuilderFactory.get("step1")
-						.tasklet(tasklet()).build())
+				.start(new StepBuilder("step1", jobRepository)
+						.tasklet(tasklet(), ptm).build())
 				.build();
 	}
 
 	@Bean
 	public Flow flow2() {
 		return new FlowBuilder<Flow>("flow2")
-				.start(stepBuilderFactory.get("step2")
-						.tasklet(tasklet()).build())
-				.next(stepBuilderFactory.get("step3")
-						.tasklet(tasklet()).build())
+				.start(new StepBuilder("step2", jobRepository)
+						.tasklet(tasklet(), ptm).build())
+				.next(new StepBuilder("step3", jobRepository)
+						.tasklet(tasklet(), ptm).build())
 				.build();
 	}
 
 	@Bean
 	public Job job() {
-		return jobBuilderFactory.get("job")
+		return new JobBuilder("job", jobRepository)
 				.start(flow1())
 				.split(new SimpleAsyncTaskExecutor()).add(flow2())
 				.end()
