@@ -24,5 +24,4 @@ public class CustomerFieldSetMapper implements FieldSetMapper<Customer> {
 				.birthdate(LocalDateTime.parse(fieldSet.readRawString("birthdate"), DT_FORMAT))
 				.build();
 	}
-
 }

@@ -1,9 +1,12 @@
 package com.example.config;
 
+import com.example.domain.Customer;
+import com.example.mapper.CustomerFieldSetMapper;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
@@ -13,17 +16,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
-
-import com.example.domain.Customer;
-import com.example.mapper.CustomerFieldSetMapper;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 public class JobConfig {
 	@Autowired
-	private StepBuilderFactory stepBuilderFactory;
+	private JobRepository jobRepository;
 	
 	@Autowired
-	private JobBuilderFactory jobBuilderFactory;
+	private PlatformTransactionManager transactionManager;
 	
 	@Bean
 	public FlatFileItemReader<Customer> customerItemReader(){
@@ -55,8 +56,8 @@ public class JobConfig {
 	
 	@Bean
 	public Step step1() {
-		return stepBuilderFactory.get("step1")
-				.<Customer, Customer>chunk(10)
+		return new StepBuilder("step1", jobRepository)
+				.<Customer, Customer>chunk(10, transactionManager)
 				.reader(customerItemReader())
 				.writer(customerItemWriter())
 				.build();
@@ -64,7 +65,7 @@ public class JobConfig {
 	
 	@Bean
 	public Job job() {
-		return jobBuilderFactory.get("job")
+		return new JobBuilder("job", jobRepository)
 				.start(step1())
 				.build();
 	}
