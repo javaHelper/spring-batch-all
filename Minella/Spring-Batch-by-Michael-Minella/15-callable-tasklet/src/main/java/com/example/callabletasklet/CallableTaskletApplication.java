@@ -2,38 +2,38 @@ package com.example.callabletasklet;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.CallableTaskletAdapter;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import java.util.concurrent.Callable;
 
 @SpringBootApplication
-@EnableBatchProcessing
 public class CallableTaskletApplication {
     @Autowired
-    private JobBuilderFactory jobBuilderFactory;
+    private JobRepository jobRepository;
 
     @Autowired
-    private StepBuilderFactory stepBuilderFactory;
+    private PlatformTransactionManager manager;
 
     @Bean
     public Job callableJob() {
-        return this.jobBuilderFactory.get("callableJob")
+        return new JobBuilder("callableJob", jobRepository)
                 .start(callableStep())
                 .build();
     }
 
     @Bean
     public Step callableStep() {
-        return this.stepBuilderFactory.get("callableStep")
-                .tasklet(tasklet())
+        return new StepBuilder("callableStep", jobRepository)
+                .tasklet(tasklet(), manager)
                 .build();
     }
 

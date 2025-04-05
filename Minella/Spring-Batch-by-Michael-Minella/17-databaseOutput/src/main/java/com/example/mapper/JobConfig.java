@@ -1,12 +1,12 @@
 package com.example.mapper;
 
 
-import javax.sql.DataSource;
-
+import com.example.model.Customer;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
@@ -18,16 +18,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.transaction.PlatformTransactionManager;
 
-import com.example.model.Customer;
+import javax.sql.DataSource;
 
 @Configuration
 public class JobConfig {
 	@Autowired
-	private StepBuilderFactory stepBuilderFactory;
+	private JobRepository jobRepository;
 	
 	@Autowired
-	private JobBuilderFactory jobBuilderFactory;
+	private PlatformTransactionManager manager;
 	
 	@Autowired
 	private DataSource dataSource;
@@ -35,7 +36,7 @@ public class JobConfig {
 	@Bean
 	public FlatFileItemReader<Customer> customerItemReader(){
 		DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer();
-		tokenizer.setNames(new String[] {"id", "firstName", "lastName", "birthdate"});
+		tokenizer.setNames("id", "firstName", "lastName", "birthdate");
 
 		DefaultLineMapper<Customer> customerLineMapper = new DefaultLineMapper<>();
 		customerLineMapper.setLineTokenizer(tokenizer);
@@ -55,15 +56,15 @@ public class JobConfig {
 	public JdbcBatchItemWriter<Customer> customerItemWriter(){
 		return new JdbcBatchItemWriterBuilder<Customer>()
 				.dataSource(this.dataSource)
-				.sql("INSERT INTO CUSTOMER VALUES (:id, :firstName, :lastName, :birthdate)")
+				.sql("INSERT INTO test.customer VALUES (:id, :firstName, :lastName, :birthdate)")
 				.itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
 				.build();
 	}
 	
 	@Bean
 	public Step step1() {
-		return stepBuilderFactory.get("step1")
-				.<Customer, Customer> chunk(10)
+		return new StepBuilder("step1", jobRepository)
+				.<Customer, Customer> chunk(10, manager)
 				.reader(customerItemReader())
 				.writer(customerItemWriter())
 				.build();
@@ -71,7 +72,7 @@ public class JobConfig {
 	
 	@Bean
 	public Job job() {
-		return jobBuilderFactory.get("job")
+		return new JobBuilder("job", jobRepository)
 				.start(step1())
 				.build();
 	}	
