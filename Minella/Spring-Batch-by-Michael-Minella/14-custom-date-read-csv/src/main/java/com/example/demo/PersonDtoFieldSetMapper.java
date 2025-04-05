@@ -9,9 +9,7 @@ import org.springframework.validation.BindException;
 
 public class PersonDtoFieldSetMapper implements FieldSetMapper<PersonDto>{
 	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-	
 
-	
 	@Override
 	public PersonDto mapFieldSet(FieldSet fieldSet) throws BindException {
 		String dob = fieldSet.readRawString("dob");

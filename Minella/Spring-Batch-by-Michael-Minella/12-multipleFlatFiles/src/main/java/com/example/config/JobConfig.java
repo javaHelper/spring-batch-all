@@ -4,6 +4,9 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.MultiResourceItemReader;
@@ -18,14 +21,15 @@ import org.springframework.core.io.Resource;
 
 import com.example.domain.Customer;
 import com.example.mapper.CustomerFieldSetMapper;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 public class JobConfig {
 	@Autowired
-	private JobBuilderFactory jobBuilderFactory;
+	private JobRepository jobRepository;
 
 	@Autowired
-	private StepBuilderFactory stepBuilderFactory;
+	private PlatformTransactionManager manager;
 
 	@Value("classpath*:/data/customer*.csv")
 	private Resource[] inputFiles;
@@ -66,8 +70,8 @@ public class JobConfig {
 	
 	@Bean
 	public Step step1() {
-		return stepBuilderFactory.get("step1")
-				.<Customer, Customer>chunk(10)
+		return new StepBuilder("step1", jobRepository)
+				.<Customer, Customer>chunk(10, manager)
 				.reader(multiResourceItemReader())
 				.writer(customerItemWriter())
 				.build();
@@ -75,7 +79,7 @@ public class JobConfig {
 	
 	@Bean
 	public Job job() {
-		return jobBuilderFactory.get("job")
+		return new JobBuilder("job", jobRepository)
 				.start(step1())
 				.build();
 	}
