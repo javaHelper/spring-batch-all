@@ -2,8 +2,9 @@ package com.example;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.builder.FlatFileItemWriterBuilder;
 import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor;
@@ -16,14 +17,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 public class JobConfiguration {
 
 	@Autowired
-	private JobBuilderFactory jobBuilderFactory;
+	private JobRepository jobRepository;
 	@Autowired
-	private StepBuilderFactory stepBuilderFactory;
+	private PlatformTransactionManager manager;
 	
 	@Bean
 	public StaxEventItemReader<ExamResult> staxEventItemReader(){
@@ -49,7 +51,8 @@ public class JobConfiguration {
 		
 		return new FlatFileItemWriterBuilder<ExamResult>()
 				.name("csvFlat")
-				.resource(new FileSystemResource("file:csv/examResult.txt"))
+				//.resource(new FileSystemResource("file:csv/examResult.txt"))
+				.resource(new FileSystemResource("./csv/examResult.txt"))
 				.lineAggregator(lineAggregator)
 				.append(true)
 				.build();
@@ -57,8 +60,8 @@ public class JobConfiguration {
 	
 	@Bean
 	public Step step1() {
-		return stepBuilderFactory.get("step1")
-				.<ExamResult, ExamResult>chunk(20)
+		return new StepBuilder("step1", jobRepository)
+				.<ExamResult, ExamResult>chunk(20, manager)
 				.reader(staxEventItemReader())
 				.writer(flatFileItemWriter())
 				.build();
@@ -66,7 +69,7 @@ public class JobConfiguration {
 	
 	@Bean
 	public Job xmlToCsvJob() {
-		return jobBuilderFactory.get("xmlToCsvJob")
+		return new JobBuilder("xmlToCsvJob", jobRepository)
 				.start(step1())
 				.build();
 	}
