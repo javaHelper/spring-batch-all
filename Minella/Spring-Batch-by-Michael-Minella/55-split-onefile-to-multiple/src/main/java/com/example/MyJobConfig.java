@@ -1,31 +1,29 @@
 package com.example;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
-import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.batch.item.file.mapping.PassThroughLineMapper;
-import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.transaction.PlatformTransactionManager;
+
+import java.time.LocalDateTime;
 
 @Configuration
 public class MyJobConfig {
 
 	@Autowired
-	private JobBuilderFactory jobBuilderFactory;
+	private JobRepository jobRepository;
 	@Autowired
-	private StepBuilderFactory stepBuilderFactory;
+	private PlatformTransactionManager manager;
 	
 	@Bean
     public FlatFileItemReader<String> itemReader() {
@@ -66,8 +64,8 @@ public class MyJobConfig {
 
     @Bean
     public Step step() {
-        return stepBuilderFactory.get("step")
-                .<String, String>chunk(3)
+        return new StepBuilder("step", jobRepository)
+                .<String, String>chunk(3, manager)
                 .reader(itemReader())
                 .writer(itemWriter())
                 .build();
@@ -75,7 +73,7 @@ public class MyJobConfig {
 
     @Bean
     public Job job() {
-        return jobBuilderFactory.get("job")
+        return new JobBuilder("job", jobRepository)
                 .start(step())
                 .build();
     }

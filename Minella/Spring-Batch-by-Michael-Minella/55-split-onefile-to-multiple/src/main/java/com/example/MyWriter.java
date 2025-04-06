@@ -3,6 +3,7 @@ package com.example;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemWriter;
@@ -15,7 +16,7 @@ public class MyWriter implements ItemWriter<String>{
     
 
 	@Override
-	public void write(List<? extends String> items) throws Exception {
+	public void write(Chunk<? extends String> items) throws Exception {
 		writer.setLineAggregator(new PassThroughLineAggregator<>());
 	    writer.setName("chunkFileItemWriter");
 	    
