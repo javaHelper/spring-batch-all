@@ -2,8 +2,9 @@ package com.example.demo;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemWriter;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import java.util.Arrays;
 
@@ -22,9 +24,9 @@ import java.util.Arrays;
 public class JobConfig {
 
     @Autowired
-    private JobBuilderFactory jobBuilderFactory;
+    private JobRepository jobRepository;
     @Autowired
-    private StepBuilderFactory stepBuilderFactory;
+    private PlatformTransactionManager manager;
 
     @Bean
     public ItemReader<Integer> itemReader() {
@@ -43,7 +45,7 @@ public class JobConfig {
         return new MultiResourceItemWriterBuilder<Integer>()
                 .name("multiResourcesWriter")
                 .delegate(itemWriter)
-                .resource(new FileSystemResource("items"))
+                .resource(new FileSystemResource("./items"))
                 .itemCountLimitPerResource(5)
                 .resourceSuffixCreator(index -> "-" + index +".txt")
                 .build();
@@ -51,8 +53,8 @@ public class JobConfig {
 
     @Bean
     public Step step1(){
-        return stepBuilderFactory.get("step1")
-                .<Integer, Integer> chunk(5)
+        return new StepBuilder("step1", jobRepository)
+                .<Integer, Integer> chunk(5, manager)
                 .reader(itemReader())
                 .writer(integerItemWriter())
                 .build();
@@ -60,7 +62,7 @@ public class JobConfig {
 
     @Bean
     public Job job(){
-        return jobBuilderFactory.get("job")
+        return new JobBuilder("job", jobRepository)
                 .start(step1())
                 .build();
     }
