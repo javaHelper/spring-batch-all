@@ -2,11 +2,11 @@ package com.example.multifilejob;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.MultiResourceItemReader;
@@ -23,6 +23,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,14 +34,13 @@ import java.util.Objects;
 
 @SuppressWarnings({"unchecked","rawtypes"})
 @SpringBootApplication
-@EnableBatchProcessing
 public class MultiFileJobApplication {
 
     @Autowired
-    private JobBuilderFactory jobBuilderFactory;
+    private JobRepository jobRepository;
 
     @Autowired
-    private StepBuilderFactory stepBuilderFactory;
+    private PlatformTransactionManager manager;
 
 	@Bean
     @StepScope
@@ -53,7 +53,8 @@ public class MultiFileJobApplication {
 
     @Bean
     @StepScope
-    public MultiResourceItemReader multiCustomerReader(@Value("#{jobParameters['customerFile']}") Resource[] inputFiles) {
+    public MultiResourceItemReader multiCustomerReader(
+    		@Value("#{jobParameters['customerFile']}") Resource[] inputFiles) {
         return new MultiResourceItemReaderBuilder<>()
                 .name("multiCustomerReader")
                 .resources(inputFiles)
@@ -110,8 +111,8 @@ public class MultiFileJobApplication {
     
 	@Bean
     public Step copyFileStep() {
-        return this.stepBuilderFactory.get("copyFileStep")
-                .<Customer, Customer>chunk(10)
+        return new StepBuilder("copyFileStep", jobRepository)
+                .<Customer, Customer>chunk(10, manager)
                 .reader(multiCustomerReader(null))
                 .writer(itemWriter())
                 .build();
@@ -119,7 +120,7 @@ public class MultiFileJobApplication {
 
     @Bean
     public Job job() {
-        return this.jobBuilderFactory.get("job")
+        return new JobBuilder("job", jobRepository)
                 .incrementer(new RunIdIncrementer())
                 .start(copyFileStep())
                 .build();
