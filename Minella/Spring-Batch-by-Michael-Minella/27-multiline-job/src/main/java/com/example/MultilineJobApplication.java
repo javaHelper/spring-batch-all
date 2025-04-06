@@ -3,9 +3,10 @@ package com.example;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
@@ -20,20 +21,20 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@EnableBatchProcessing
 @SpringBootApplication
 public class MultilineJobApplication {
     @Autowired
-    private JobBuilderFactory jobBuilderFactory;
+    private JobRepository jobRepository;
 
     @Autowired
-    private StepBuilderFactory stepBuilderFactory;
+    private PlatformTransactionManager manager;
 
     @Autowired
     private TransactionFieldSetMapper transactionFieldSetMapper;
@@ -94,8 +95,8 @@ public class MultilineJobApplication {
 
     @Bean
     public Step copyFileStep() {
-        return this.stepBuilderFactory.get("copyFileStep")
-                .<Customer, Customer>chunk(10)
+        return new StepBuilder("copyFileStep", jobRepository)
+                .<Customer, Customer>chunk(10, manager)
                 .reader(customerFileReader())
                 .writer(itemWriter())
                 .build();
@@ -103,7 +104,7 @@ public class MultilineJobApplication {
 
     @Bean
     public Job job() {
-        return this.jobBuilderFactory.get("job")
+        return new JobBuilder("job", jobRepository)
                 .start(copyFileStep())
                 .build();
     }
