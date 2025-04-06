@@ -2,8 +2,9 @@ package com.example.demo;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
@@ -11,14 +12,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 public class JobConfig {
     @Autowired
-    private JobBuilderFactory jobs;
+    private JobRepository jobRepository;
 
     @Autowired
-    private StepBuilderFactory steps;
+    private PlatformTransactionManager manager;
 
     @Bean
     public FlatFileItemReader<Person> itemReader() {
@@ -44,8 +46,8 @@ public class JobConfig {
 
     @Bean
     public Step step() {
-        return steps.get("step")
-                .<Person, Person>chunk(1)
+        return new StepBuilder("step", jobRepository)
+                .<Person, Person>chunk(1, manager)
                 .reader(itemReader())
                 .writer(itemWriter())
                 .build();
@@ -53,7 +55,7 @@ public class JobConfig {
 
     @Bean
     public Job job() {
-        return jobs.get("job")
+        return new JobBuilder("job", jobRepository)
                 .start(step())
                 .build();
     }
