@@ -1,11 +1,12 @@
 package com.example.jpajob;
 
+import jakarta.persistence.EntityManagerFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
@@ -14,19 +15,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.transaction.PlatformTransactionManager;
 
-import javax.persistence.EntityManagerFactory;
 import java.util.Collections;
 
 
-@EnableBatchProcessing
 @SpringBootApplication
 public class JpaJobApplication {
     @Autowired
-    private JobBuilderFactory jobBuilderFactory;
+    private JobRepository jobRepository;
 
     @Autowired
-    private StepBuilderFactory stepBuilderFactory;
+    private PlatformTransactionManager manager;
 
     @Bean
     @StepScope
@@ -65,8 +65,8 @@ public class JpaJobApplication {
 
     @Bean
     public Step copyFileStep() {
-        return this.stepBuilderFactory.get("copyFileStep")
-                .<Customer, Customer>chunk(10)
+        return new StepBuilder("copyFileStep", jobRepository)
+                .<Customer, Customer>chunk(10, manager)
                 .reader(customerItemReader(null, null))
                 .writer(itemWriter())
                 .build();
@@ -74,7 +74,7 @@ public class JpaJobApplication {
 
     @Bean
     public Job job() {
-        return this.jobBuilderFactory.get("job")
+        return new JobBuilder("job", jobRepository)
                 .start(copyFileStep())
                 .build();
     }

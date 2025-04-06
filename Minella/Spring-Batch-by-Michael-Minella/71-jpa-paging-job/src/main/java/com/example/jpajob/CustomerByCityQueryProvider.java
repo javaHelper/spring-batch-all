@@ -1,10 +1,10 @@
 package com.example.jpajob;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import org.springframework.batch.item.database.orm.AbstractJpaQueryProvider;
 import org.springframework.util.Assert;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
 
 /**
  * Abstract JPA Query Provider to serve as a base class for all JPA Query providers.
