@@ -2,6 +2,7 @@ package com.example.writer;
 
 import java.util.List;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -13,7 +14,7 @@ public class CustomerWriter implements ItemWriter<Customer>{
 	private CustomerRepository CustomerRepository;
 	
 	@Override
-	public void write(List<? extends Customer> customers) throws Exception {
+	public void write(Chunk<? extends Customer> customers) throws Exception {
 		CustomerRepository.saveAll(customers);
 	}
 }

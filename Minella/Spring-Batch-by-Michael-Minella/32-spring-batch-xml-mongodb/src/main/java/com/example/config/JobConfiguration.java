@@ -1,31 +1,32 @@
 package com.example.config;
 
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.example.domain.Customer;
+import com.example.writer.CustomerWriter;
+import com.thoughtworks.xstream.security.AnyTypePermission;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.xml.StaxEventItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.oxm.xstream.XStreamMarshaller;
+import org.springframework.transaction.PlatformTransactionManager;
 
-import com.example.domain.Customer;
-import com.example.writer.CustomerWriter;
-import com.thoughtworks.xstream.security.AnyTypePermission;
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 public class JobConfiguration {
 	@Autowired
-	private JobBuilderFactory jobBuilderFactory;
+	private JobRepository jobRepository;
 	
 	@Autowired
-	private StepBuilderFactory stepBuilderFactory;
+	private PlatformTransactionManager manager;
 	
 	
 	@SuppressWarnings("rawtypes")
@@ -61,8 +62,8 @@ public class JobConfiguration {
 	
 	@Bean
 	public Step step1() throws Exception {
-		return stepBuilderFactory.get("step1")
-				.<Customer, Customer>chunk(200)
+		return new StepBuilder("step1", jobRepository)
+				.<Customer, Customer>chunk(200, manager)
 				.reader(customerItemReader())
 				.writer(customerWriter())
 				.build();
@@ -70,7 +71,7 @@ public class JobConfiguration {
 	
 	@Bean
 	public Job job() throws Exception {
-		return jobBuilderFactory.get("job")
+		return new JobBuilder("job", jobRepository)
 				.start(step1())
 				.build();
 	}
