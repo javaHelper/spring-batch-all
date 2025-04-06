@@ -1,17 +1,13 @@
 package com.example.configuration;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.sql.DataSource;
-
+import com.example.aggregator.CustomLineAggregator;
+import com.example.mapper.CustomerRowMapper;
+import com.example.model.Customer;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
 import org.springframework.batch.item.database.Order;
@@ -28,18 +24,22 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.oxm.xstream.XStreamMarshaller;
+import org.springframework.transaction.PlatformTransactionManager;
 
-import com.example.aggregator.CustomLineAggregator;
-import com.example.mapper.CustomerRowMapper;
-import com.example.model.Customer;
+import javax.sql.DataSource;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Configuration
 public class JobConfiguration {
 	@Autowired
-	private JobBuilderFactory jobBuilderFactory;
+	private JobRepository jobRepository;
 
 	@Autowired
-	private StepBuilderFactory stepBuilderFactory;
+	private PlatformTransactionManager manager;
 
 	@Autowired
 	private DataSource dataSource;
@@ -112,8 +112,8 @@ public class JobConfiguration {
 
 	@Bean
 	public Step step1() throws Exception {
-		return stepBuilderFactory.get("step1")
-				.<Customer, Customer>chunk(10)
+		return new StepBuilder("step1", jobRepository)
+				.<Customer, Customer>chunk(10, manager)
 				.reader(customerPagingItemReader())
 				.writer(itemWriter())
 				.build();
@@ -121,7 +121,7 @@ public class JobConfiguration {
 
 	@Bean
 	public Job job() throws Exception {
-		return jobBuilderFactory.get("job")
+		return new JobBuilder("job", jobRepository)
 				.start(step1())
 				.build();
 	}
