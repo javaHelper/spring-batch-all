@@ -6,8 +6,8 @@ import org.springframework.classify.Classifier;
 public class ZipCodeClassifier implements Classifier<Customer, ItemProcessor<Customer, Customer>> {
 	private static final long serialVersionUID = 1L;
 	
-	private ItemProcessor<Customer, Customer> oddItemProcessor;
-    private ItemProcessor<Customer, Customer> evenItemProcessor;
+	private final ItemProcessor<Customer, Customer> oddItemProcessor;
+    private final ItemProcessor<Customer, Customer> evenItemProcessor;
 
     public ZipCodeClassifier(ItemProcessor<Customer, Customer> oddItemProcessor,
                              ItemProcessor<Customer, Customer> evenItemProcessor) {
