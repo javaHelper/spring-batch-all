@@ -2,8 +2,9 @@ package com.example.demo;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 import java.util.Arrays;
@@ -20,9 +22,9 @@ import java.util.HashMap;
 @Configuration
 public class JobConfig {
     @Autowired
-    private JobBuilderFactory jobBuilderFactory;
+    private JobRepository jobRepository;
     @Autowired
-    private StepBuilderFactory stepBuilderFactory;
+    private PlatformTransactionManager manager;
 
     @Autowired
     private DataSource dataSource;
@@ -67,8 +69,8 @@ public class JobConfig {
 
     @Bean
     public Step step1(){
-        return stepBuilderFactory.get("step1")
-                .<HashMap<String, String>, HashMap<String, String>>chunk(3)
+        return new StepBuilder("step1", jobRepository)
+                .<HashMap<String, String>, HashMap<String, String>>chunk(3, manager)
                 .reader(itemReader())
                 .processor(itemProcessor())
                 .writer(batchItemWriter())
@@ -77,7 +79,7 @@ public class JobConfig {
 
     @Bean
     public Job job(){
-        return jobBuilderFactory.get("job")
+        return new JobBuilder("job", jobRepository)
                 .start(step1())
                 .build();
     }
