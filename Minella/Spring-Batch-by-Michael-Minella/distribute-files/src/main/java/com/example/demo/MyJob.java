@@ -1,12 +1,10 @@
 package com.example.demo;
 
-import java.util.Arrays;
-
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -18,16 +16,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.transaction.PlatformTransactionManager;
 
-@EnableBatchProcessing
+import java.util.Arrays;
+
 @Configuration
 public class MyJob {
 	
 	@Autowired
-	private JobBuilderFactory jobs;
+	private JobRepository jobRepository;
 	
 	@Autowired
-	private StepBuilderFactory steps;
+	private PlatformTransactionManager manager;
 
 	@Bean
     public ItemReader<Integer> itemReader() {
@@ -68,15 +68,15 @@ public class MyJob {
     
     @Bean
     public Job job() {
-        return jobs.get("job")
+        return new JobBuilder("job", jobRepository)
                 .start(step1())
                 .build();
     }
 
     @Bean
 	public Step step1() {
-		return steps.get("step")
-		        .<Integer, Integer>chunk(5)
+		return new StepBuilder("step", jobRepository)
+		        .<Integer, Integer>chunk(5, manager)
 		        .reader(itemReader())
 		        .processor(itemProcessor())
 		        .writer(itemWriter())
