@@ -8,6 +8,9 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,29 +20,27 @@ import org.springframework.context.annotation.Configuration;
 import com.example.demo.exception.CustomRetryableException;
 import com.example.demo.processor.RetryItemProcessor;
 import com.example.demo.writer.RetryItemWriter;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.StringUtils;
 
 @Configuration
 public class JobConfiguration {
 
 	@Autowired
-	public JobBuilderFactory jobBuilderFactory;
+	public JobRepository jobRepository;
 
 	@Autowired
-	public StepBuilderFactory stepBuilderFactory;
+	public PlatformTransactionManager manager;
 
 	@Bean
 	@StepScope
 	public ListItemReader reader() {
-
 		List<String> items = new ArrayList<>();
 
 		for(int i = 0; i < 100; i++) {
 			items.add(String.valueOf(i));
 		}
-
 		ListItemReader<String> reader = new ListItemReader(items);
-
 		return reader;
 	}
 
@@ -66,8 +67,8 @@ public class JobConfiguration {
 	@SuppressWarnings("unchecked")
 	@Bean
 	public Step step1() {
-		return stepBuilderFactory.get("step")
-				.<String, String>chunk(10)
+		return new StepBuilder("step", jobRepository)
+				.<String, String>chunk(10, manager)
 				.reader(reader())
 				.processor(processor(null))
 				.writer(writer(null))
@@ -79,7 +80,7 @@ public class JobConfiguration {
 
 	@Bean
 	public Job job() {
-		return jobBuilderFactory.get("job")
+		return new JobBuilder("job", jobRepository)
 				.start(step1())
 				.build();
 	}

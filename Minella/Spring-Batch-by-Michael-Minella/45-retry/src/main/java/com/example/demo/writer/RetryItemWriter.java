@@ -2,6 +2,7 @@ package com.example.demo.writer;
 
 import java.util.List;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 
 import com.example.demo.exception.CustomRetryableException;
@@ -12,7 +13,7 @@ public class RetryItemWriter implements ItemWriter<String> {
 	private int attemptCount = 0;
 
 	@Override
-	public void write(List<? extends String> items) throws Exception {
+	public void write(Chunk<? extends String> items) throws Exception {
 		for (String item : items) {
 			System.out.println("writing item " + item);
 			if(retry && item.equalsIgnoreCase("-84")) {
