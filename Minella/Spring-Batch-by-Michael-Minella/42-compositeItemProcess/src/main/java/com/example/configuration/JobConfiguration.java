@@ -12,7 +12,10 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
 import org.springframework.batch.item.database.Order;
@@ -32,14 +35,15 @@ import com.example.mapper.CustomerRowMapper;
 import com.example.model.Customer;
 import com.example.processor.FilteringItemProcessor;
 import com.example.processor.UpperCaseItemProcessor;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 public class JobConfiguration {
 	@Autowired
-	private JobBuilderFactory jobBuilderFactory;
-	
+	private JobRepository jobRepository;
+
 	@Autowired
-	private StepBuilderFactory stepBuilderFactory;
+	private PlatformTransactionManager manager;
 	
 	@Autowired
 	private DataSource dataSource;
@@ -94,8 +98,8 @@ public class JobConfiguration {
 	
 	@Bean
 	public Step step1() throws Exception {
-		return stepBuilderFactory.get("step1")
-				.<Customer, Customer>chunk(100)
+		return new StepBuilder("step1", jobRepository)
+				.<Customer, Customer>chunk(100, manager)
 				.reader(customerPagingItemReader())
 				.processor(compositeItemProcessor())
 				.writer(customerItemWriter())
@@ -104,7 +108,7 @@ public class JobConfiguration {
 	
 	@Bean
 	public Job job() throws Exception {
-		return jobBuilderFactory.get("job")
+		return new JobBuilder("job",jobRepository)
 				.incrementer(new RunIdIncrementer())
 				.start(step1())
 				.build();
