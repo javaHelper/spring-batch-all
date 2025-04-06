@@ -11,15 +11,15 @@ import org.springframework.stereotype.Component;
 public class CustomerService {
     private List<Customer> customers;
     private int curIndex;
-    private String[] firstNames = {"Michael", "Warren", "Ann", "Terrence", "Erica", "Laura", "Steve", "Larry"};
+    private final String[] firstNames = {"Michael", "Warren", "Ann", "Terrence", "Erica", "Laura", "Steve", "Larry"};
     private String middleInitial = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    private String[] lastNames = {"Gates", "Darrow", "Donnelly", "Jobs", "Buffett", "Ellison", "Obama"};
-    private String[] streets = {"4th Street", "Wall Street", "Fifth Avenue", "Mt. Lee Drive", "Jeopardy Lane",
+    private final String[] lastNames = {"Gates", "Darrow", "Donnelly", "Jobs", "Buffett", "Ellison", "Obama"};
+    private final String[] streets = {"4th Street", "Wall Street", "Fifth Avenue", "Mt. Lee Drive", "Jeopardy Lane",
             "Infinite Loop Drive", "Farnam Street", "Isabella Ave", "S. Greenwood Ave"};
-    private String[] cities = {"Chicago", "New York", "Hollywood", "Aurora", "Omaha", "Atherton"};
-    private String[] states = {"IL", "NY", "CA", "NE"};
+    private final String[] cities = {"Chicago", "New York", "Hollywood", "Aurora", "Omaha", "Atherton"};
+    private final String[] states = {"IL", "NY", "CA", "NE"};
 
-    private Random generator = new Random();
+    private final Random generator = new Random();
 
     public CustomerService() {
         curIndex = 0;
