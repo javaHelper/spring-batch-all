@@ -8,6 +8,7 @@ public class UpperCaseItemProcessor implements ItemProcessor<Customer, Customer>
 
 	@Override
 	public Customer process(Customer item) throws Exception {
+		System.out.println(item);
 		return new Customer(item.getId(),
 				item.getFirstName().toUpperCase(),
 				item.getLastName().toUpperCase(),
