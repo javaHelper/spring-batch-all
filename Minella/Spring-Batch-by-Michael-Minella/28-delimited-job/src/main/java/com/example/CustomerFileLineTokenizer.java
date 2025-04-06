@@ -15,8 +15,8 @@ import org.springframework.batch.item.file.transform.LineTokenizer;
 public class CustomerFileLineTokenizer implements LineTokenizer {
 
     private String delimiter = ",";
-    private String[] names = new String[]{"firstName", "middleInitial", "lastName", "addressNumber", "city", "state", "zipCode"};
-    private FieldSetFactory fieldSetFactory = new DefaultFieldSetFactory();
+    private final String[] names = new String[]{"firstName", "middleInitial", "lastName", "addressNumber", "city", "state", "zipCode"};
+    private final FieldSetFactory fieldSetFactory = new DefaultFieldSetFactory();
 
     public FieldSet tokenize(String record) {
         String[] fields = record.split(delimiter);
