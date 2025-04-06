@@ -8,15 +8,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CustomerLineAggregator implements LineAggregator<Customer> {
 
-	private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-	@Override
-	public String aggregate(Customer item) {
-		try {
-			return objectMapper.writeValueAsString(item);
-		}
-		catch (JsonProcessingException e) {
-			throw new RuntimeException("Unable to serialize Customer", e);
-		}
-	}
+    @Override
+    public String aggregate(Customer item) {
+        try {
+            return objectMapper.writeValueAsString(item);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Unable to serialize Customer", e);
+        }
+    }
 }
