@@ -13,12 +13,14 @@ public class CustomerRowMapper implements RowMapper<Customer> {
 	@Override
 	public Customer mapRow(ResultSet rs, int rowNum) throws SQLException {
 		//@// @formatter:off
-		return Customer.builder()
+		Customer customer = Customer.builder()
 				.id(rs.getLong("id"))
 				.firstName(rs.getString("firstName"))
 				.lastName(rs.getString("lastName"))
 				.birthdate(rs.getString("birthdate"))
 				.build(); 
+		System.out.println(customer);
+		return customer;
 		// @formatter:on
 	}
 }
