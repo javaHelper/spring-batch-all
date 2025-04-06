@@ -1,29 +1,30 @@
 package com.example.config.batch;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import com.example.domain.Customer;
+import com.example.writer.CustomerWriter;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.xml.StaxEventItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.oxm.xstream.XStreamMarshaller;
+import org.springframework.transaction.PlatformTransactionManager;
 
-import com.example.domain.Customer;
-import com.example.writer.CustomerWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 public class JobConfiguration {
 	@Autowired
-	private JobBuilderFactory jobBuilderFactory;
+	private JobRepository jobRepository;
 	
 	@Autowired
-	private StepBuilderFactory stepBuilderFactory;
+	private PlatformTransactionManager manager;
 
 	@Bean
 	public StaxEventItemReader<Customer> customerItemReader(){
@@ -32,14 +33,16 @@ public class JobConfiguration {
 		
 		CustomerConverter converter = new CustomerConverter();
 
-		XStreamMarshaller ummarshaller = new XStreamMarshaller();
-		ummarshaller.setAliases(aliases);
-		ummarshaller.setConverters(converter);
-		
+		XStreamMarshaller marshaller = new XStreamMarshaller();
+		marshaller.setAliases(aliases);
+		marshaller.setConverters(converter);
+		marshaller.setAnnotatedClasses(Customer.class);
+		marshaller.getXStream().allowTypes(new Class[]{Customer.class});
+
 		StaxEventItemReader<Customer> reader = new StaxEventItemReader<>();
 		reader.setResource(new ClassPathResource("/data/customer.xml"));
 		reader.setFragmentRootElementName("customer");
-		reader.setUnmarshaller(ummarshaller);
+		reader.setUnmarshaller(marshaller);
 		
 		return reader;
 	}
@@ -51,8 +54,8 @@ public class JobConfiguration {
 	
 	@Bean
 	public Step step1() throws Exception {
-		return stepBuilderFactory.get("step1")
-				.<Customer, Customer>chunk(200)
+		return new StepBuilder("step1", jobRepository)
+				.<Customer, Customer>chunk(200, manager)
 				.reader(customerItemReader())
 				.writer(customerWriter())
 				.build();
@@ -60,7 +63,7 @@ public class JobConfiguration {
 	
 	@Bean
 	public Job job() throws Exception {
-		return jobBuilderFactory.get("job")
+		return new JobBuilder("job", jobRepository)
 				.start(step1())
 				.build();
 	}

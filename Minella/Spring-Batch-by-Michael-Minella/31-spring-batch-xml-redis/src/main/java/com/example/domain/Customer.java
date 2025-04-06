@@ -16,7 +16,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Data
-@XmlRootElement(name = "Customer")
 @RedisHash(value="customer")
 public class Customer {
 	@Id
