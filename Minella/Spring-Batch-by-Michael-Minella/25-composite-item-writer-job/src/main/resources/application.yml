@@ -1,12 +1,21 @@
 spring:
   batch:
+    job:
+      enabled: false
     jdbc:
       initialize-schema: always
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/test
     username: 'root'
-    password: 'Password'
+    password: 'root'
+
+#  sql:
+#    init:
+#      mode: ALWAYS
+#      schema-locations:
+#        - 'classpath:schema-mysql.sql'
+#      data-locations:
+#        - 'classpath:import.sql'
 #  main:
 #    allow-bean-definition-overriding: true
-

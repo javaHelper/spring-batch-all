@@ -1,4 +1,4 @@
-CREATE TABLE CUSTOMER  (
+CREATE TABLE customer  (
   id BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   first_name VARCHAR(45) ,
   middle_initial VARCHAR(1) ,
