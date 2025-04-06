@@ -1,12 +1,10 @@
 package com.example;
 
-import java.util.Arrays;
-import java.util.HashMap;
-
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
@@ -16,15 +14,19 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
+import org.springframework.transaction.PlatformTransactionManager;
+
+import java.util.Arrays;
+import java.util.HashMap;
 
 @Configuration
 public class MyJobConfig {
 
 	@Autowired
-	private JobBuilderFactory jobs;
+	private JobRepository jobRepository;
 
 	@Autowired
-	private StepBuilderFactory steps;
+	private PlatformTransactionManager manager;
 
 	@Bean
 	public ItemReader<Person> itemReader() {
@@ -46,7 +48,7 @@ public class MyJobConfig {
 
 		return new StaxEventItemWriterBuilder<Person>()
 				.name("personWriter")
-				.resource(new FileSystemResource("persons.xml"))
+				.resource(new FileSystemResource("./persons.xml"))
 				.marshaller(marshaller)
 				.rootTagName("persons")
 				.rootElementAttributes(rootElementAttributes)
@@ -55,8 +57,8 @@ public class MyJobConfig {
 
 	@Bean
 	public Step step() {
-		return steps.get("step")
-				.<Person, Person>chunk(5)
+		return new StepBuilder("step", jobRepository)
+				.<Person, Person>chunk(5, manager)
 				.reader(itemReader())
 				.writer(itemWriter())
 				.build();
@@ -64,7 +66,7 @@ public class MyJobConfig {
 
 	@Bean
 	public Job job() {
-		return jobs.get("job")
+		return new JobBuilder("job", jobRepository)
 				.start(step())
 				.build();
 	}

@@ -1,11 +1,12 @@
 package com.example;
 
-import javax.xml.bind.annotation.XmlRootElement;
 
+import jakarta.xml.bind.annotation.XmlRootElement;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 
 @XmlRootElement
 @AllArgsConstructor
@@ -15,5 +16,4 @@ import lombok.NoArgsConstructor;
 public class Person {
 	private int id;
     private String name;
-
 }
