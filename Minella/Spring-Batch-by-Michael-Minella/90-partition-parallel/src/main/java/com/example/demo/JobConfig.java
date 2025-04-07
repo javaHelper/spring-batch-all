@@ -2,10 +2,11 @@ package com.example.demo;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.partition.support.Partitioner;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -24,10 +26,10 @@ import java.util.Map;
 @Configuration
 public class JobConfig {
     @Autowired
-    private JobBuilderFactory jobs;
+    private JobRepository jobRepository;
 
     @Autowired
-    private StepBuilderFactory steps;
+    private PlatformTransactionManager manager;
 
     @Bean
     public SimpleAsyncTaskExecutor taskExecutor() {
@@ -35,7 +37,7 @@ public class JobConfig {
     }
 
     @Bean
-    public Partitioner partitioner(){
+    public Partitioner partitioner() {
         return gridSize -> {
             Map<String, ExecutionContext> map = new HashMap<>(gridSize);
             for (int i = 0; i < gridSize; i++) {
@@ -50,14 +52,14 @@ public class JobConfig {
 
     @Bean
     public Step workerStep() {
-        return steps.get("workerStep")
-                .tasklet(getTasklet(null))
+        return new StepBuilder("workerStep", jobRepository)
+                .tasklet(getTasklet(null), manager)
                 .build();
     }
 
     @Bean
     public Step step1() {
-        return steps.get("step1")
+        return new StepBuilder("step1", jobRepository)
                 .partitioner(workerStep().getName(), partitioner())
                 .step(workerStep())
                 .gridSize(3)
@@ -80,23 +82,23 @@ public class JobConfig {
 
     @Bean
     public Step moveFilesStep() {
-        return steps.get("moveFilesStep")
+        return new StepBuilder("moveFilesStep", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
                     System.out.println("moveFilesStep");
                     // add code to move files where needed
                     return RepeatStatus.FINISHED;
-                })
+                }, manager)
                 .build();
     }
 
     @Bean
     public Step cleanupFilesStep() {
-        return steps.get("cleanupFilesStep")
+        return new StepBuilder("cleanupFilesStep", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
                     System.out.println("cleaning up..");
                     deleteFiles();
                     return RepeatStatus.FINISHED;
-                })
+                }, manager)
                 .build();
     }
 
@@ -108,15 +110,15 @@ public class JobConfig {
 
     @Bean
     public Job job() {
-        return jobs.get("job")
+        return new JobBuilder("job", jobRepository)
                 .flow(step1())
-                	.on("FAILED").to(cleanupFilesStep())
+                .on("FAILED").to(cleanupFilesStep())
                 .from(step1())
-                	.on("*").to(moveFilesStep())
+                .on("*").to(moveFilesStep())
                 .from(moveFilesStep())
-                	.on("*").end()
+                .on("*").end()
                 .from(cleanupFilesStep())
-                	.on("*").fail()
+                .on("*").fail()
                 .build()
                 .build();
     }
