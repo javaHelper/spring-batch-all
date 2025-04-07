@@ -1,15 +1,18 @@
 package com.example.configuration;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.sql.DataSource;
-
+import com.example.decider.ContextDecider;
+import com.example.listener.PaymentStepExecutionListener;
+import com.example.model.Payment;
+import com.example.rowmapper.PaymentRowMapper;
+import com.example.tasklet.PaymentContextTasklet;
+import com.example.tasklet.PaymentDataTasklet;
+import com.example.tasklet.SendPaymentBatchFilesTasklet;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
 import org.springframework.batch.item.database.Order;
@@ -17,22 +20,19 @@ import org.springframework.batch.item.database.support.MySqlPagingQueryProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.PlatformTransactionManager;
 
-import com.example.decider.ContextDecider;
-import com.example.listener.PaymentStepExecutionListener;
-import com.example.model.Payment;
-import com.example.rowmapper.PaymentRowMapper;
-import com.example.tasklet.PaymentDataTasklet;
-import com.example.tasklet.SendPaymentBatchFilesTasklet;
-import com.example.tasklet.PaymentContextTasklet;
+import javax.sql.DataSource;
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 public class JobConfiguration {
 	@Autowired
-	private JobBuilderFactory jobBuilderFactory;
+	private JobRepository jobRepository;
 	
 	@Autowired
-	private StepBuilderFactory stepBuilderFactory;
+	private PlatformTransactionManager manager;
 	
 	@Autowired
 	private DataSource dataSource;
@@ -86,8 +86,8 @@ public class JobConfiguration {
 	
 	@Bean
 	public Step step1() {
-		return stepBuilderFactory.get("step1")
-				.<Payment, Payment>chunk(10)
+		return new StepBuilder("step1", jobRepository)
+				.<Payment, Payment>chunk(10, manager)
 				.reader(pagingItemReader())
 				.writer(paymentItemWriter())
 				.listener(paymentStepExecutionListener())
@@ -101,22 +101,22 @@ public class JobConfiguration {
 	
 	@Bean
 	public Step paymentContextStep() {
-		return stepBuilderFactory.get("paymentContextStep")
-				.tasklet(paymentContextTasklet())
+		return new StepBuilder("paymentContextStep", jobRepository)
+				.tasklet(paymentContextTasklet(), manager)
 				.build();
 	}
 	
 	@Bean
 	public Step paymentDataStep() {
-		return stepBuilderFactory.get("paymentDataStep")
-				.tasklet(paymentDataTasklet())
+		return new StepBuilder("paymentDataStep", jobRepository)
+				.tasklet(paymentDataTasklet(), manager)
 				.build();
 	}
 	
 	@Bean
 	public Step endStep() {
-		return stepBuilderFactory.get("endStep")
-				.tasklet(null)
+		return new StepBuilder("endStep", jobRepository)
+				.tasklet(null, manager)
 				.build();
 	}
 	
@@ -127,14 +127,14 @@ public class JobConfiguration {
 	
 	@Bean 
 	public Step sendPaymentBatchFiles() {
-		return stepBuilderFactory.get("sendPaymentBatchFiles")
-				.tasklet(sendPaymentBatchFilesTasklet())
+		return new StepBuilder("sendPaymentBatchFiles", jobRepository)
+				.tasklet(sendPaymentBatchFilesTasklet(), manager)
 				.build();
 	}
 	
 	@Bean
 	public Job paymentDataBatchJob() {
-		return jobBuilderFactory.get("paymentDataBatchJob")
+		return new JobBuilder("paymentDataBatchJob", jobRepository)
 				.start(paymentContextStep())
 				.next(contextDecider())
 					.on("Payment").to(paymentDataStep()).on("COMPLETED").to(step1())
