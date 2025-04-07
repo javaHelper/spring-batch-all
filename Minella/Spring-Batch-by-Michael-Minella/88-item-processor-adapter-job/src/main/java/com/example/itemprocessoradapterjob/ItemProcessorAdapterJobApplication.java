@@ -2,10 +2,10 @@ package com.example.itemprocessoradapterjob;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.adapter.ItemProcessorAdapter;
 import org.springframework.batch.item.file.FlatFileItemReader;
@@ -16,15 +16,15 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @SpringBootApplication
-@EnableBatchProcessing
 public class ItemProcessorAdapterJobApplication {
     @Autowired
-    public JobBuilderFactory jobBuilderFactory;
+    public JobRepository jobRepository;
 
     @Autowired
-    public StepBuilderFactory stepBuilderFactory;
+    public PlatformTransactionManager manager;
 
     @Bean
     @StepScope
@@ -53,8 +53,8 @@ public class ItemProcessorAdapterJobApplication {
 
     @Bean
     public Step copyFileStep() {
-        return this.stepBuilderFactory.get("copyFileStep")
-                .<Customer, Customer>chunk(5)
+        return new StepBuilder("copyFileStep", jobRepository)
+                .<Customer, Customer>chunk(5, manager)
                 .reader(customerItemReader(null))
                 .processor(itemProcessor(null))
                 .writer(itemWriter())
@@ -63,7 +63,7 @@ public class ItemProcessorAdapterJobApplication {
 
     @Bean
     public Job job() throws Exception {
-        return this.jobBuilderFactory.get("job")
+        return new JobBuilder("job", jobRepository)
                 .start(copyFileStep())
                 .build();
     }
