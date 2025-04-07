@@ -2,11 +2,12 @@ package com.example.demo;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.JobScope;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.SimpleStepBuilder;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
 import org.springframework.batch.item.file.FlatFileItemWriter;
@@ -18,6 +19,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 import java.util.Map;
@@ -27,10 +29,10 @@ import java.util.Map;
 @Configuration
 public class JobConfig {
     @Autowired
-    private StepBuilderFactory stepBuilderFactory;
-    
+    private JobRepository jobRepository;
+
     @Autowired
-    private JobBuilderFactory jobBuilderFactory;
+    private PlatformTransactionManager manager;
     
     @Autowired
     private DataSource dataSource;
@@ -43,8 +45,8 @@ public class JobConfig {
 
     @Bean
     public Step step1() {
-        return stepBuilderFactory.get("calculateDistinctValuesAndRegisterWriters")
-                .tasklet(new DynamicWritersConfigurationTasklet(jdbcTemplate, applicationContext))
+        return new StepBuilder("calculateDistinctValuesAndRegisterWriters", jobRepository)
+                .tasklet(new DynamicWritersConfigurationTasklet(jdbcTemplate, applicationContext), manager)
                 .build();
     }
 
@@ -76,8 +78,8 @@ public class JobConfig {
     @Bean
     @JobScope
     public Step step2() {
-        SimpleStepBuilder<Student, Student> step2 = stepBuilderFactory.get("readWriteStudents")
-                .<Student, Student>chunk(2)
+        SimpleStepBuilder<Student, Student> step2 = new StepBuilder("readWriteStudents", jobRepository)
+                .<Student, Student>chunk(2, manager)
                 .reader(itemReader(dataSource))
                 .writer(itemWriter());
 
@@ -92,7 +94,7 @@ public class JobConfig {
 
     @Bean
     public Job job(JdbcTemplate jdbcTemplate, ConfigurableApplicationContext applicationContext) {
-        return jobBuilderFactory.get("job")
+        return new JobBuilder("job", jobRepository)
                 .start(step1())
                 .next(step2())
                 .build();

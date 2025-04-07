@@ -20,8 +20,8 @@ import java.util.List;
 
 public class DynamicWritersConfigurationTasklet implements Tasklet {
 
-    private JdbcTemplate jdbcTemplate;
-    private ConfigurableApplicationContext applicationContext;
+    private final JdbcTemplate jdbcTemplate;
+    private final ConfigurableApplicationContext applicationContext;
 
     public DynamicWritersConfigurationTasklet(JdbcTemplate jdbcTemplate,
                                               ConfigurableApplicationContext applicationContext) {
