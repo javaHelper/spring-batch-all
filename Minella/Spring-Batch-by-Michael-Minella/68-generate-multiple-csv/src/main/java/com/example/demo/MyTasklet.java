@@ -3,6 +3,7 @@ package com.example.demo;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
 import org.springframework.batch.item.file.FlatFileItemWriter;
@@ -57,7 +58,7 @@ public class MyTasklet implements Tasklet {
                 .names("id", "name")
                 .build();
         itemWriter.open(executionContext);
-        itemWriter.write(Collections.singletonList(person));
+        itemWriter.write(new Chunk<>(Collections.singletonList(person)));
         itemWriter.close();
     }
 }
