@@ -2,28 +2,28 @@ package com.example.executioncontextjob;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @SpringBootApplication
-@EnableBatchProcessing
 public class ExecutionContextJobApplication {
 	@Autowired
-	private JobBuilderFactory jobBuilderFactory;
+	private JobRepository jobRepository;
 
 	@Autowired
-	private StepBuilderFactory stepBuilderFactory;
+	private PlatformTransactionManager manager;
 
 	@Bean
 	public Job helloWorldBatchJob() {
-		return this.jobBuilderFactory.get("helloWorldBatchJob")
+		return new JobBuilder("helloWorldBatchJob", jobRepository)
 				.incrementer(new RunIdIncrementer())
 				.start(helloWorldStep())
 				.build();
@@ -31,8 +31,8 @@ public class ExecutionContextJobApplication {
 
 	@Bean
 	public Step helloWorldStep() {
-		return this.stepBuilderFactory.get("helloWorldStep")
-				.tasklet(tasklet())
+		return new StepBuilder("helloWorldStep", jobRepository)
+				.tasklet(tasklet(), manager)
 				.build();
 	}
 
