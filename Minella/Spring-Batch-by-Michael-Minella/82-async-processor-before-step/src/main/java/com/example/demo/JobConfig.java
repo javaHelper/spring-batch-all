@@ -1,11 +1,9 @@
 package com.example.demo;
 
-import java.util.Arrays;
-import java.util.concurrent.Future;
-
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.integration.async.AsyncItemProcessor;
 import org.springframework.batch.integration.async.AsyncItemWriter;
@@ -17,13 +15,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.transaction.PlatformTransactionManager;
+
+import java.util.Arrays;
+import java.util.concurrent.Future;
 
 @Configuration
 public class JobConfig {
     @Autowired
-    private StepBuilderFactory steps;
+    private JobRepository jobRepository;
     @Autowired
-    private JobBuilderFactory jobs;
+    private PlatformTransactionManager manager;
 
     @Bean
     public ItemReader<Integer> itemReader() {
@@ -61,14 +63,14 @@ public class JobConfig {
 
     @Bean
     public Job job() {
-        return jobs.get("myJob")
+        return new JobBuilder("myJob", jobRepository)
                 .start(getMyStep())
                 .build();
     }
 
     private TaskletStep getMyStep() {
-        return steps.get("myStep")
-                .<Integer, Future<Integer>>chunk(5)
+        return new StepBuilder("myStep", jobRepository)
+                .<Integer, Future<Integer>>chunk(5, manager)
                 .reader(itemReader())
                 .processor(asyncItemProcessor())
                 .writer(asyncItemWriter())
