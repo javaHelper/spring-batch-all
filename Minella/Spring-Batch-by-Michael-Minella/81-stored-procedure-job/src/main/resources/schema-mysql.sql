@@ -1,7 +1,7 @@
 create database test;
 use test;
 
-CREATE TABLE CUSTOMER  (
+CREATE TABLE customer  (
   id BIGINT  NOT NULL PRIMARY KEY ,
   firstName VARCHAR(11) NOT NULL ,
   middleInitial VARCHAR(1),
@@ -16,7 +16,7 @@ DELIMITER //
 
 CREATE PROCEDURE customer_list(IN cityOption CHAR(16))
   BEGIN
-    SELECT * FROM CUSTOMER
+    SELECT * FROM customer
     WHERE city = cityOption;
   END //
 

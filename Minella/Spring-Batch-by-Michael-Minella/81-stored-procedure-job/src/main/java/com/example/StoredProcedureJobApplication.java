@@ -2,10 +2,10 @@ package com.example;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.StoredProcedureItemReader;
 import org.springframework.batch.item.database.builder.StoredProcedureItemReaderBuilder;
@@ -16,19 +16,19 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.ArgumentPreparedStatementSetter;
 import org.springframework.jdbc.core.SqlParameter;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 import java.sql.Types;
 
-@EnableBatchProcessing
 @SpringBootApplication
 public class StoredProcedureJobApplication {
 
 	@Autowired
-	private JobBuilderFactory jobBuilderFactory;
+	private JobRepository jobRepository;
 
 	@Autowired
-	private StepBuilderFactory stepBuilderFactory;
+	private PlatformTransactionManager manager;
 
 	@Bean
 	@StepScope
@@ -52,8 +52,8 @@ public class StoredProcedureJobApplication {
 
 	@Bean
 	public Step copyFileStep() {
-		return this.stepBuilderFactory.get("copyFileStep")
-				.<Customer, Customer>chunk(10)
+		return new StepBuilder("copyFileStep", jobRepository)
+				.<Customer, Customer>chunk(10, manager)
 				.reader(customerItemReader(null, null))
 				.writer(itemWriter())
 				.build();
@@ -61,7 +61,7 @@ public class StoredProcedureJobApplication {
 
 	@Bean
 	public Job job() {
-		return this.jobBuilderFactory.get("job")
+		return new JobBuilder("job", jobRepository)
 				.start(copyFileStep())
 				.build();
 	}

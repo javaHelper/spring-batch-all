@@ -6,7 +6,7 @@ spring:
     driverClassName: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/test
     username: 'root'
-    password: 'Password'
+    password: 'root'
 
   jpa:
     show-sql: true
