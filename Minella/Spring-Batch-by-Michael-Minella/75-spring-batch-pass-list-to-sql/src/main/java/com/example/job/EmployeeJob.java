@@ -1,19 +1,16 @@
 package com.example.job;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.sql.DataSource;
-
+import com.example.model.Employee;
+import com.example.rowmapper.EmployeeMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.PreparedStatementCreatorFactory;
@@ -22,16 +19,26 @@ import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterUtils;
 import org.springframework.jdbc.core.namedparam.ParsedSql;
+import org.springframework.transaction.PlatformTransactionManager;
 
-import com.example.model.Employee;
-import com.example.rowmapper.EmployeeMapper;
-
-import lombok.extern.slf4j.Slf4j;
+import javax.sql.DataSource;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Configuration
-@EnableBatchProcessing
 @Slf4j
 public class EmployeeJob {
+
+	@Autowired
+	private DataSource dataSource;
+
+	@Autowired
+	private JobRepository jobRepository;
+
+	@Autowired
+	private PlatformTransactionManager manager;
 
 	@Bean
 	public JdbcCursorItemReader<Employee> itemReader(DataSource dataSource) {
@@ -72,10 +79,10 @@ public class EmployeeJob {
 	}
 
 	@Bean
-	public Job job(JobBuilderFactory jobs, StepBuilderFactory steps, DataSource dataSource) {
-		return jobs.get("job")
-				.start(steps.get("step")
-						.<Employee, Employee>chunk(5)
+	public Job job() {
+		return new JobBuilder("job", jobRepository)
+				.start(new StepBuilder("step", jobRepository)
+						.<Employee, Employee>chunk(5, manager)
 						.reader(itemReader(dataSource))
 						.writer(itemWriter())
 						.build())
