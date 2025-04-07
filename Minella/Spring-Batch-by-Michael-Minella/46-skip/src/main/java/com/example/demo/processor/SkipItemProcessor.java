@@ -1,12 +1,14 @@
 package com.example.demo.processor;
 
+import lombok.Setter;
 import org.springframework.batch.item.ItemProcessor;
 
 import com.example.demo.exception.CustomRetryableException;
 
 public class SkipItemProcessor implements ItemProcessor<String, String> {
 
-	private boolean skip = false;
+	@Setter
+    private boolean skip = false;
 	private int attemptCount = 0;
 
 	@Override
@@ -19,11 +21,7 @@ public class SkipItemProcessor implements ItemProcessor<String, String> {
 			throw new CustomRetryableException("Process failed.  Attempt:" + attemptCount);
 		}
 		else {
-			return String.valueOf(Integer.valueOf(item) * -1);
+			return String.valueOf(Integer.parseInt(item) * -1);
 		}
-	}
-
-	public void setSkip(boolean skip) {
-		this.skip = skip;
 	}
 }
