@@ -2,10 +2,10 @@ package com.example;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
@@ -19,17 +19,17 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import java.io.File;
 import java.io.IOException;
 
 @SpringBootApplication
-@EnableBatchProcessing
 public class FormattedTextFileJobApplication {
     @Autowired
-    private JobBuilderFactory jobBuilderFactory;
+    private JobRepository jobRepository;
     @Autowired
-    private StepBuilderFactory stepBuilderFactory;
+    private PlatformTransactionManager manager;
 
     @Bean
     @StepScope
@@ -70,8 +70,8 @@ public class FormattedTextFileJobApplication {
 
     @Bean
     public Step formatStep() throws IOException {
-        return this.stepBuilderFactory.get("formatStep")
-                .<Customer, Customer>chunk(10)
+        return new StepBuilder("formatStep", jobRepository)
+                .<Customer, Customer>chunk(10, manager)
                 .reader(customerFileReader(null))
                 .writer(customerItemWriter())
                 .build();
@@ -79,7 +79,7 @@ public class FormattedTextFileJobApplication {
 
     @Bean
     public Job formatJob() throws IOException {
-        return this.jobBuilderFactory.get("formatJob")
+        return new JobBuilder("formatJob", jobRepository)
                 .start(formatStep())
                 .build();
     }
