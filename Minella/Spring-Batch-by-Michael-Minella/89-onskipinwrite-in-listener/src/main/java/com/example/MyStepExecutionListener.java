@@ -2,12 +2,15 @@ package com.example;
 
 import java.util.List;
 
+import org.springframework.batch.core.SkipListener;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.annotation.OnSkipInProcess;
 import org.springframework.batch.core.annotation.OnSkipInRead;
 import org.springframework.batch.core.annotation.OnSkipInWrite;
 import org.springframework.batch.core.annotation.OnWriteError;
+import org.springframework.batch.item.Chunk;
 
-public class StepExecutionListener {
+public class MyStepExecutionListener implements SkipListener {
 	@OnSkipInRead
 	public void onSkipInRead(Throwable t) {
 		System.err.println("-- On Skip in Read Error : " + t.getMessage());
@@ -24,7 +27,9 @@ public class StepExecutionListener {
 	}
 
 	@OnWriteError
-	public void onWriteError(Exception exception, List<? extends Integer> items) {
+	public void onWriteError(Exception exception, Chunk<? extends Integer> items) {
 		System.err.println("-- Error on write on " + items + " : " + exception.getMessage());
 	}
+
+
 }
