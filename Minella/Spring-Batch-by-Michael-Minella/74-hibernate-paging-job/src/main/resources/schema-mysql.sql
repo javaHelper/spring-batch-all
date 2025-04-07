@@ -1,4 +1,4 @@
-CREATE TABLE test.CUSTOMER  (
+CREATE TABLE customer  (
   id BIGINT  NOT NULL PRIMARY KEY ,
   firstName VARCHAR(255) NOT NULL ,
   middleInitial VARCHAR(255),
