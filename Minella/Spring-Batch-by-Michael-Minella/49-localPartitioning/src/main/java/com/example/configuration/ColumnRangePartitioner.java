@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import lombok.Setter;
 import org.springframework.batch.core.partition.support.Partitioner;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.jdbc.core.JdbcOperations;
@@ -17,18 +18,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
  */
 public class ColumnRangePartitioner implements Partitioner {
 	private JdbcOperations jdbcTemplate;
-	private String table;
-	private String column;
+	@Setter
+    private String table;
+	@Setter
+    private String column;
 
-	public void setTable(String table) {
-		this.table = table;
-	}
-
-	public void setColumn(String column) {
-		this.column = column;
-	}
-
-	public void setDataSource(DataSource dataSource) {
+    public void setDataSource(DataSource dataSource) {
 		jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 

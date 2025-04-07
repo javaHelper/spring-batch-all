@@ -1,15 +1,13 @@
 package com.example.configuration;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.sql.DataSource;
-
+import com.example.domain.Customer;
+import com.example.mapper.CustomerRowMapper;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
@@ -22,17 +20,19 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.transaction.PlatformTransactionManager;
 
-import com.example.domain.Customer;
-import com.example.mapper.CustomerRowMapper;
+import javax.sql.DataSource;
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 public class JobConfiguration {
 	@Autowired
-	private JobBuilderFactory jobBuilderFactory;
+	private JobRepository jobRepository;
 
 	@Autowired
-	private StepBuilderFactory stepBuilderFactory;
+	private PlatformTransactionManager manager;
 
 	@Autowired
 	private DataSource dataSource;
@@ -48,8 +48,10 @@ public class JobConfiguration {
 
 	@Bean
 	@StepScope
-	public JdbcPagingItemReader<Customer> pagingItemReader(@Value("#{stepExecutionContext['minValue']}") Long minValue,
+	public JdbcPagingItemReader<Customer> pagingItemReader(
+			@Value("#{stepExecutionContext['minValue']}") Long minValue,
 			@Value("#{stepExecutionContext['maxValue']}") Long maxValue) {
+
 		System.out.println("reading " + minValue + " to " + maxValue);
 
 		Map<String, Order> sortKeys = new HashMap<>();
@@ -76,7 +78,7 @@ public class JobConfiguration {
 	public JdbcBatchItemWriter<Customer> customerItemWriter(){
 		return new JdbcBatchItemWriterBuilder<Customer>()
 				.dataSource(this.dataSource)
-				.sql("INSERT INTO NEW_CUSTOMER VALUES (:id, :firstName, :lastName, :birthdate)")
+				.sql("INSERT INTO new_customer VALUES (:id, :firstName, :lastName, :birthdate)")
 				.itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
 				.build();
 	}
@@ -84,7 +86,7 @@ public class JobConfiguration {
 	// Master
 	@Bean
 	public Step step1() {
-		return stepBuilderFactory.get("step1")
+		return new StepBuilder("step1", jobRepository)
 				.partitioner(slaveStep().getName(), partitioner())
 				.step(slaveStep())
 				.gridSize(4)
@@ -95,8 +97,8 @@ public class JobConfiguration {
 	// slave step
 	@Bean
 	public Step slaveStep() {
-		return stepBuilderFactory.get("slaveStep")
-				.<Customer, Customer>chunk(1000)
+		return new StepBuilder("slaveStep", jobRepository)
+				.<Customer, Customer>chunk(1000, manager)
 				.reader(pagingItemReader(null, null))
 				.writer(customerItemWriter())
 				.build();
@@ -104,7 +106,7 @@ public class JobConfiguration {
 	
 	@Bean
 	public Job job() {
-		return jobBuilderFactory.get("job")
+		return new JobBuilder("job", jobRepository)
 				.start(step1())
 				.build();
 	}
