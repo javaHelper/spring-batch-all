@@ -1,10 +1,10 @@
 package com.example;
 
-import javax.sql.DataSource;
-
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
@@ -14,6 +14,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.PlatformTransactionManager;
+
+import javax.sql.DataSource;
 
 @Configuration
 public class MyConfig {
@@ -21,9 +24,9 @@ public class MyConfig {
 	private static final String READ_SQL = "select * from address where personId = ?";
 
 	@Autowired
-	private JobBuilderFactory jobBuilderFactory;
+	private JobRepository jobRepository;
 	@Autowired
-	private StepBuilderFactory stepBuilderFactory;
+	private PlatformTransactionManager manager;
 
 	@Autowired
 	private DataSource dataSource;
@@ -43,32 +46,33 @@ public class MyConfig {
 	@Bean
 	public ItemProcessor<Person, Person> itemProcessor() {
 		return new ItemProcessor<Person, Person>() {
-
-			@SuppressWarnings("deprecation")
-			@Override
-			public Person process(Person person) {
-				Address address = jdbcTemplate.queryForObject(READ_SQL, new Object[]{person.getId()}, 
-						new BeanPropertyRowMapper<>(Address.class));
-				person.setAddress(address);
-				return person;
-			}
-		};
+            @Override
+            public Person process(Person person) throws Exception {
+                Address address = jdbcTemplate.queryForObject(READ_SQL, new Object[]{person.getId()},
+                        new BeanPropertyRowMapper<>(Address.class));
+                person.setAddress(address);
+                return person;
+            }
+        };
 	}
 
 	@Bean
 	public ItemWriter<Person> itemWriter() {
-		return items -> {
-			for (Person item : items) {
-				System.out.println("item = " + item);
-			}
-		};
+		return new ItemWriter<Person>() {
+            @Override
+            public void write(Chunk<? extends Person> items) throws Exception {
+                for (Person item : items) {
+                    System.out.println("item = " + item);
+                }
+            }
+        };
 	}
 
 	@Bean
 	public Job job() {
-		return jobBuilderFactory.get("job")
-				.start(stepBuilderFactory.get("step")
-						.<Person, Person>chunk(2)
+		return new JobBuilder("job", jobRepository)
+				.start(new StepBuilder("step", jobRepository)
+						.<Person, Person>chunk(2, manager)
 						.reader(itemReader())
 						.processor(itemProcessor())
 						.writer(itemWriter())
