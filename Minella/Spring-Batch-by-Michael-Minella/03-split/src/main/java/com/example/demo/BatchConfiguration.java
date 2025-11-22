@@ -62,8 +62,8 @@ public class BatchConfiguration {
 
 		@Override
 		public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-			System.out.println(String.format("%s has been executed on thread %s", 
-					chunkContext.getStepContext().getStepName(), Thread.currentThread().getName()));
+			System.out.printf("%s has been executed on thread %s%n",
+					chunkContext.getStepContext().getStepName(), Thread.currentThread().getName());
 			return RepeatStatus.FINISHED;
 		}
 	}
