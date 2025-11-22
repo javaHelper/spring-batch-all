@@ -36,5 +36,4 @@ public class SpringBatchPassListToSqlApplication implements CommandLineRunner {
 		JobExecution execution = jobLauncher.run(job, jobParameters);
 		System.out.println("STATUS :: "+execution.getStatus());	
 	}
-
 }

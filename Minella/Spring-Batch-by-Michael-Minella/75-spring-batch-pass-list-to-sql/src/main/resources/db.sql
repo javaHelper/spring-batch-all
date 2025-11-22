@@ -1,3 +1,7 @@
+drop database test;
+create database test;
+use test;
+
 CREATE TABLE `test`.`employee` (
   `empId` INT NOT NULL,
   `firstName` VARCHAR(45) NULL,
