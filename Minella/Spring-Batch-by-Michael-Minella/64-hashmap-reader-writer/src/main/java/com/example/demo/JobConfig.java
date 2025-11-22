@@ -16,8 +16,8 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 @Configuration
 public class JobConfig {
@@ -42,7 +42,7 @@ public class JobConfig {
         HashMap<String, String> item3 = new HashMap<>();
         item3.put("id", "3");
         item3.put("name", "Mike");
-        return new ListItemReader<>(Arrays.asList(item1, item2, item3));
+        return new ListItemReader<>(List.of(item1, item2, item3));
     }
 
     @Bean
@@ -55,10 +55,9 @@ public class JobConfig {
 
     @Bean
     public JdbcBatchItemWriter<HashMap<String, String>> batchItemWriter(){
-        String sql = "insert into person (id, name) values (:id, :name)";
         return new JdbcBatchItemWriterBuilder<HashMap<String, String>>()
                 .dataSource(dataSource)
-                .sql(sql)
+                .sql("insert into person (id, name) values (:id, :name)")
                 .itemSqlParameterSourceProvider(item -> {
                     MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource();
                     mapSqlParameterSource.addValues(item);
