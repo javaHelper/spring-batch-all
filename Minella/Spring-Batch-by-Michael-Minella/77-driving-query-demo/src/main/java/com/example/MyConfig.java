@@ -25,11 +25,13 @@ public class MyConfig {
 
 	@Autowired
 	private JobRepository jobRepository;
+
 	@Autowired
 	private PlatformTransactionManager manager;
 
 	@Autowired
 	private DataSource dataSource;
+
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
