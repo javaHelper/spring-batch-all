@@ -3,10 +3,11 @@ package com.example.demo;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
@@ -18,23 +19,24 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @EnableBatchProcessing
 @Configuration
 public class MyJob {
 
-	@Autowired
-	private JobBuilderFactory jobBuilderFactory;
-	
-	@Autowired
-	private StepBuilderFactory stepBuilderFactory;
-	
-	@Bean
-	public ColumnRangePartitioner columnRangePartitioner() {
-		return new ColumnRangePartitioner();
-	}
-	
-	private LineMapper<Customer> lineMapper() {
+    @Autowired
+    private JobRepository jobRepository;
+
+    @Autowired
+    private PlatformTransactionManager manager;
+
+    @Bean
+    public ColumnRangePartitioner columnRangePartitioner() {
+        return new ColumnRangePartitioner();
+    }
+
+    private LineMapper<Customer> lineMapper() {
         DefaultLineMapper<Customer> lineMapper = new DefaultLineMapper<>();
 
         DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer();
@@ -50,8 +52,8 @@ public class MyJob {
         return lineMapper;
 
     }
-	
-	@Bean
+
+    @Bean
     public FlatFileItemReader<Customer> reader() {
         FlatFileItemReader<Customer> itemReader = new FlatFileItemReader<>();
         itemReader.setResource(new FileSystemResource("src/main/resources/customers.csv"));
@@ -60,8 +62,8 @@ public class MyJob {
         itemReader.setLineMapper(lineMapper());
         return itemReader;
     }
-	
-	@Bean
+
+    @Bean
     public TaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
         taskExecutor.setMaxPoolSize(4);
@@ -69,8 +71,8 @@ public class MyJob {
         taskExecutor.setQueueCapacity(4);
         return taskExecutor;
     }
-	
-	@Bean
+
+    @Bean
     public PartitionHandler partitionHandler() {
         TaskExecutorPartitionHandler taskExecutorPartitionHandler = new TaskExecutorPartitionHandler();
         taskExecutorPartitionHandler.setGridSize(4);
@@ -78,33 +80,39 @@ public class MyJob {
         taskExecutorPartitionHandler.setStep(slaveStep());
         return taskExecutorPartitionHandler;
     }
-	
-	@Bean
-	public MyWriter myWriter() {
-		return new MyWriter();
-	}
-	
-	@Bean
+
+    @Bean
+    public CustomItemProcessor customItemProcessor(){
+        return new CustomItemProcessor();
+    }
+
+    @Bean
+    public MyWriter myWriter() {
+        return new MyWriter();
+    }
+
+    @Bean
     public Step slaveStep() {
-        return stepBuilderFactory.get("slaveStep")
-        		.<Customer, Customer>chunk(50)
+        return new StepBuilder("slaveStep", jobRepository)
+                .<Customer, Customer>chunk(50, manager)
                 .reader(reader())
+                .processor(customItemProcessor())
                 .writer(myWriter())
                 .build();
     }
-	
-	@Bean
+
+    @Bean
     public Step masterStep() {
-        return stepBuilderFactory.get("masterSTep").
+        return new StepBuilder("masterSTep", jobRepository).
                 partitioner(slaveStep().getName(), columnRangePartitioner())
                 .partitionHandler(partitionHandler())
                 .build();
     }
-	
-	
-	@Bean
+
+
+    @Bean
     public Job runJob() {
-        return jobBuilderFactory.get("importCustomers")
+        return new JobBuilder("importCustomers", jobRepository)
                 .flow(masterStep())
                 .end()
                 .build();
