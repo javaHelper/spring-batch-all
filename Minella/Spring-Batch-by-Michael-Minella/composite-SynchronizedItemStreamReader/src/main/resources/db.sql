@@ -1,9 +1,12 @@
+drop database test;
+create database test;
+use test;
+
 CREATE TABLE `test`.`person` (
   `id` INT NOT NULL,
   `name` VARCHAR(255) NULL,
   PRIMARY KEY (`id`));
 
-  
 INSERT INTO `test`.`person` (`id`, `name`) VALUES ('1', 'Mike');
 INSERT INTO `test`.`person` (`id`, `name`) VALUES ('2', 'Matt');
 INSERT INTO `test`.`person` (`id`, `name`) VALUES ('3', 'Deepak');

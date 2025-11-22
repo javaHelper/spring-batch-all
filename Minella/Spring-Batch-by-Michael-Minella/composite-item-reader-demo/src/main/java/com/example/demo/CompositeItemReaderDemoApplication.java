@@ -21,5 +21,4 @@ public class CompositeItemReaderDemoApplication implements CommandLineRunner{
 		Integer persons = jdbcTemplate.queryForObject("select count(*) from person_target", Integer.class);
 		System.out.println("Persons in db = " + persons); // should be 6
 	}
-
 }

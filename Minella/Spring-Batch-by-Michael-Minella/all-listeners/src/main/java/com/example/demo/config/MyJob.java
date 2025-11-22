@@ -1,28 +1,34 @@
-package com.example.demo;
+package com.example.demo.config;
 
-import java.util.Arrays;
-
+import com.example.demo.Person;
+import com.example.demo.listeners.ItemProcessLogListener;
+import com.example.demo.listeners.ItemReadLogListener;
+import com.example.demo.listeners.ItemWriteLogListener;
+import com.example.demo.listeners.LogChunkListener;
+import com.example.demo.listeners.LogStepExecutionListener;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.SimpleStepBuilder;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.PlatformTransactionManager;
+
+import java.util.Arrays;
 
 @Configuration
-@EnableBatchProcessing
 public class MyJob {
 	@Autowired
-	private JobBuilderFactory jobBuilderFactory;
+	private JobRepository jobRepository;
 	
 	@Autowired
-	private StepBuilderFactory stepBuilderFactory;
+	private PlatformTransactionManager manager;
 	
 	@Bean
 	public ItemReader<Integer> itemReader(){
@@ -31,9 +37,9 @@ public class MyJob {
 	
 	@Bean
 	public Step step1() {
-		SimpleStepBuilder<Integer, Person> builder = stepBuilderFactory.get("step")
+		SimpleStepBuilder<Integer, Person> builder = new StepBuilder("step", jobRepository)
 				.allowStartIfComplete(true)
-				.<Integer, Person>chunk(2)
+				.<Integer, Person>chunk(2, manager)
 				.reader(new ListItemReader<>(Arrays.asList(1, 2, 3, 4)))
 				.listener(new ItemReadLogListener())
 				.processor((ItemProcessor<Integer, Person>) item -> new Person("foo" + item))
@@ -54,9 +60,8 @@ public class MyJob {
 	
 	@Bean
 	public Job job() {
-		return jobBuilderFactory.get("job")
+		return new JobBuilder("job", jobRepository)
 				.start(step1())
 				.build();
 	}
-	
 }

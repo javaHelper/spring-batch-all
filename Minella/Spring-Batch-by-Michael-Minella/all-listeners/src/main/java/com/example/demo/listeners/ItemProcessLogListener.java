@@ -1,5 +1,6 @@
-package com.example.demo;
+package com.example.demo.listeners;
 
+import com.example.demo.Person;
 import org.springframework.batch.core.ItemProcessListener;
 
 public class ItemProcessLogListener implements ItemProcessListener<Integer, Person> {
