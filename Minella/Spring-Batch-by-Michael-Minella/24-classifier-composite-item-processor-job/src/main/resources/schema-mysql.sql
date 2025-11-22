@@ -1,6 +1,6 @@
+drop database test;
 create database test;
 use test;
-
 CREATE TABLE CUSTOMER  (
   id BIGINT  NOT NULL PRIMARY KEY ,
   firstName VARCHAR(11) NOT NULL ,

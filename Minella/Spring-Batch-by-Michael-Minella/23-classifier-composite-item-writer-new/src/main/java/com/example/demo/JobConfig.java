@@ -41,7 +41,7 @@ public class JobConfig {
     public ClassifierCompositeItemWriter<Person> classifierCompositeItemWriter(ItemWriter<Person> fooItemWriter, 
     																		   ItemWriter<Person> barItemWriter) {
         ClassifierCompositeItemWriter<Person> classifierCompositeItemWriter = new ClassifierCompositeItemWriter<>();
-        classifierCompositeItemWriter.setClassifier(new PersonClassifier(fooItemWriter(), barItemWriter()));
+        classifierCompositeItemWriter.setClassifier(new PersonClassifier(fooItemWriter, barItemWriter));
         return classifierCompositeItemWriter;
     }
 

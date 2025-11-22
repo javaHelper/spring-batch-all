@@ -9,5 +9,4 @@ public class ClassifierCompositeItemWriterNewApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(ClassifierCompositeItemWriterNewApplication.class, args);
 	}
-
 }

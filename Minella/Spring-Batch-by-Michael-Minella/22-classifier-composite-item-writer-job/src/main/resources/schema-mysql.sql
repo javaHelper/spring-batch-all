@@ -1,3 +1,6 @@
+drop database test;
+create database test;
+use test;
 CREATE TABLE customer  (
   id BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   first_name VARCHAR(45) ,
