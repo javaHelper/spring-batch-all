@@ -1,12 +1,10 @@
 package com.example.demo.config;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.example.demo.exception.CustomRetryableException;
+import com.example.demo.processor.RetryItemProcessor;
+import com.example.demo.writer.RetryItemWriter;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
@@ -16,12 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import com.example.demo.exception.CustomRetryableException;
-import com.example.demo.processor.RetryItemProcessor;
-import com.example.demo.writer.RetryItemWriter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 public class JobConfiguration {
