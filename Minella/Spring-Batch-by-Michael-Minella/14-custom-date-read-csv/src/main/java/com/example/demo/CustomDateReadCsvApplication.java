@@ -9,5 +9,4 @@ public class CustomDateReadCsvApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(CustomDateReadCsvApplication.class, args);
 	}
-
 }

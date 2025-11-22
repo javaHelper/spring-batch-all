@@ -8,7 +8,7 @@ import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.validation.BindException;
 
 public class PersonDtoFieldSetMapper implements FieldSetMapper<PersonDto>{
-	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 	@Override
 	public PersonDto mapFieldSet(FieldSet fieldSet) throws BindException {
@@ -21,5 +21,4 @@ public class PersonDtoFieldSetMapper implements FieldSetMapper<PersonDto>{
 				.dob(LocalDate.parse(dob, formatter))
 				.build();
 	}
-
 }

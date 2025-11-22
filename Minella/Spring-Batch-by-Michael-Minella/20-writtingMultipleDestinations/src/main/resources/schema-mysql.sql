@@ -1,3 +1,6 @@
+drop database test;
+create database test;
+use test;
 CREATE TABLE `test`.`customer` (
   `id` MEDIUMINT(8) UNSIGNED NOT NULL,
   `firstName` VARCHAR(255) NULL,
