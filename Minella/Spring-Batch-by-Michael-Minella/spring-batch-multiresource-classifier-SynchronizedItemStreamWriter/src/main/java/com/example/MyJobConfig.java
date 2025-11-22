@@ -2,8 +2,9 @@ package com.example;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.FlatFileItemWriter;
@@ -25,24 +26,25 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 public class MyJobConfig {
 
     @Autowired
-    private JobBuilderFactory jobBuilderFactory;
+    private JobRepository jobRepository;
     @Autowired
-    private StepBuilderFactory stepBuilderFactory;
-    
+    private PlatformTransactionManager manager;
+
     @Bean
     public TaskExecutor taskExecutor() {
-    	ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
-		taskExecutor.setCorePoolSize(4);
-		taskExecutor.setMaxPoolSize(4);
-		taskExecutor.afterPropertiesSet();
-		return taskExecutor;
+        ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+        taskExecutor.setCorePoolSize(4);
+        taskExecutor.setMaxPoolSize(4);
+        taskExecutor.afterPropertiesSet();
+        return taskExecutor;
     }
-    
+
     @Bean
     public FlatFileItemReader<Employee> itemReader() {
         DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer();
@@ -64,10 +66,10 @@ public class MyJobConfig {
     @Bean
     public ClassifierCompositeItemWriter<Employee> classifierCompositeItemWriter() throws Exception {
         Classifier<Employee, ItemWriter<? super Employee>> classifier = new EmployeeClassifier(
-                javaDeveloperItemWriter(), 
-                pythonDeveloperItemWriter(), 
+                javaDeveloperItemWriter(),
+                pythonDeveloperItemWriter(),
                 cloudDeveloperItemWriter());
-        
+
         return new ClassifierCompositeItemWriterBuilder<Employee>()
                 .classifier(classifier)
                 .build();
@@ -87,11 +89,11 @@ public class MyJobConfig {
                 .itemCountLimitPerResource(5)
                 .resourceSuffixCreator(index -> "-" + index)
                 .build();
-        
-        
+
+
         return new SynchronizedItemStreamWriterBuilder<Employee>()
-    			.delegate(multiResourceItemWriter)
-    			.build();
+                .delegate(multiResourceItemWriter)
+                .build();
     }
 
     @Bean
@@ -108,10 +110,10 @@ public class MyJobConfig {
                 .itemCountLimitPerResource(5)
                 .resourceSuffixCreator(index -> "-" + index)
                 .build();
-        
+
         return new SynchronizedItemStreamWriterBuilder<Employee>()
-    			.delegate(multiResourceItemWriter)
-    			.build();
+                .delegate(multiResourceItemWriter)
+                .build();
     }
 
     @Bean
@@ -128,17 +130,17 @@ public class MyJobConfig {
                 .itemCountLimitPerResource(5)
                 .resourceSuffixCreator(index -> "-" + index)
                 .build();
-        
+
         return new SynchronizedItemStreamWriterBuilder<Employee>()
-    			.delegate(multiResourceItemWriter)
-    			.build();
+                .delegate(multiResourceItemWriter)
+                .build();
     }
-        
+
 
     @Bean
     public Step step() throws Exception {
-        return stepBuilderFactory.get("step")
-                .<Employee, Employee>chunk(3)
+        return new StepBuilder("step", jobRepository)
+                .<Employee, Employee>chunk(3, manager)
                 .reader(itemReader())
                 .writer(classifierCompositeItemWriter())
                 .taskExecutor(taskExecutor())
@@ -147,7 +149,7 @@ public class MyJobConfig {
 
     @Bean
     public Job job() throws Exception {
-        return jobBuilderFactory.get("job")
+        return new JobBuilder("job", jobRepository)
                 .start(step())
                 .build();
     }
