@@ -1,3 +1,7 @@
+drop database test;
+create database test;
+use test;
+
 CREATE TABLE `customer` (
   `id` mediumint(8) unsigned NOT NULL auto_increment,
   `firstName` varchar(255) default NULL,

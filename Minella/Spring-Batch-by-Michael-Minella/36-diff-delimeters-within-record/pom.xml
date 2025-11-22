@@ -5,11 +5,11 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.2.10</version>
+		<version>3.5.8</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>diff-delimeters-within-record</artifactId>
+	<artifactId>36-diff-delimeters-within-record</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>36-diff-delimeters-within-record</name>
 	<description>Demo project for Spring Boot</description>

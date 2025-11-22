@@ -1,16 +1,13 @@
 package com.example.domain;
 
-import java.time.LocalDate;
-
-import javax.xml.bind.annotation.XmlRootElement;
-
-import org.springframework.data.annotation.Id;
-import org.springframework.data.redis.core.RedisHash;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
+
+import java.time.LocalDate;
 
 @AllArgsConstructor
 @NoArgsConstructor
