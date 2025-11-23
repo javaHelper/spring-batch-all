@@ -1,3 +1,10 @@
+--create database batchmetadata;
+--use batchmetadata;
+
+drop database test;
+create database test;
+use test;
+
 create table Customer (
        id bigint not null auto_increment,
         birthdate varchar(255),
@@ -5,3 +12,6 @@ create table Customer (
         lastName varchar(255),
         primary key (id)
     ) engine=InnoDB;
+
+
+

@@ -1,5 +1,6 @@
 package com.example;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemWriter;
@@ -8,13 +9,11 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
-
 
 @Service
 public class EmployeeWriter implements ItemWriter<Employee> {
     @Override
-    public void write(List<? extends Employee> items) throws Exception {
+    public void write(Chunk<? extends Employee> items) throws Exception {
         final FlatFileItemWriter<Employee> writer = new FlatFileItemWriter<>();
         writer.setLineAggregator(new PassThroughLineAggregator<>());
         writer.setName("chunkFileItemWriter");
