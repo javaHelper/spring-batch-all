@@ -6,10 +6,11 @@ import com.example.demo.writer.CustomerWriter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
@@ -20,12 +21,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @RequiredArgsConstructor
 public class JobConfig {
-    private final JobBuilderFactory jobBuilderFactory;
-    private final StepBuilderFactory stepBuilderFactory;
+    private final JobRepository jobRepository;
+    private final PlatformTransactionManager manager;
     private final CustomerWriter customerWriter;
 
     @Bean
@@ -71,7 +73,8 @@ public class JobConfig {
 
     @Bean
     public Step slaveStep() {
-        return stepBuilderFactory.get("slaveStep").<Customer, Customer>chunk(250)
+        return new StepBuilder("slaveStep", jobRepository)
+                .<Customer, Customer>chunk(250, manager)
                 .reader(reader())
                 .writer(customerWriter)
                 .build();
@@ -79,15 +82,15 @@ public class JobConfig {
 
     @Bean
     public Step masterStep() {
-        return stepBuilderFactory.get("masterSTep")
-        		.partitioner(slaveStep().getName(), partitioner())
+        return new StepBuilder("masterStep", jobRepository)
+                .partitioner(slaveStep().getName(), partitioner())
                 .partitionHandler(partitionHandler())
                 .build();
     }
 
     @Bean
     public Job runJob() {
-        return jobBuilderFactory.get("importCustomers")
+        return new JobBuilder("importCustomers", jobRepository)
                 .flow(masterStep())
                 .end()
                 .build();
