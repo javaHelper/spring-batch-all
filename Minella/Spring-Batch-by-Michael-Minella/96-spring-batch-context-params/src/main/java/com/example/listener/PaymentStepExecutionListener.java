@@ -32,5 +32,4 @@ public class PaymentStepExecutionListener implements StepExecutionListener{
 		System.out.println(payments);
 		return stepExecution.getExitStatus();
 	}
-
 }

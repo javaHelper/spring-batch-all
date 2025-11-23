@@ -30,6 +30,4 @@ public class MyStepExecutionListener implements SkipListener {
 	public void onWriteError(Exception exception, Chunk<? extends Integer> items) {
 		System.err.println("-- Error on write on " + items + " : " + exception.getMessage());
 	}
-
-
 }

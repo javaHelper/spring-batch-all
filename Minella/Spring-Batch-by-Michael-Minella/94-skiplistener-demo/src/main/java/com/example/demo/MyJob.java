@@ -1,26 +1,28 @@
 package com.example.demo;
 
-import java.util.Arrays;
-
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.PlatformTransactionManager;
+
+import java.util.Arrays;
 
 @Configuration
 public class MyJob {
 
     @Autowired
-    private JobBuilderFactory jobs;
+    private JobRepository jobRepository;
 
     @Autowired
-    private StepBuilderFactory steps;
+    private PlatformTransactionManager manager;
 
     @Bean
     public ItemReader<Integer> itemReader() {
@@ -44,8 +46,8 @@ public class MyJob {
 
     @Bean
     public Step step() {
-        return steps.get("step")
-                .<Integer, Integer>chunk(5)
+        return new StepBuilder("step", jobRepository)
+                .<Integer, Integer>chunk(5, manager)
                 .reader(itemReader())
                 .writer(itemWriter())
                 .faultTolerant()
@@ -58,16 +60,16 @@ public class MyJob {
 
     @Bean
     public Job job() {
-        return jobs.get("job")
+        return new JobBuilder("job", jobRepository)
                 .start(step())
                 .build();
     }
-    
+
     @Bean
     public MySkipListener mySkipListener() {
         return new MySkipListener();
     }
-    
+
     @Bean
     public MyStepListener myStepListener() {
         return new MyStepListener();

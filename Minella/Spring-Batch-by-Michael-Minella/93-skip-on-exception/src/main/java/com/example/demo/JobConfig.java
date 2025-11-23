@@ -2,8 +2,9 @@ package com.example.demo;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -11,15 +12,16 @@ import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import java.util.Arrays;
 
 @Configuration
 public class JobConfig {
     @Autowired
-    private StepBuilderFactory stepBuilderFactory;
+    private JobRepository jobRepository;
     @Autowired
-    private JobBuilderFactory jobBuilderFactory;
+    private PlatformTransactionManager manager;
 
     @Bean
     public ItemReader<Integer> itemReader() {
@@ -27,15 +29,15 @@ public class JobConfig {
     }
 
     @Bean
-    public ItemProcessor<Integer, Integer> itemProcessor(){
+    public ItemProcessor<Integer, Integer> itemProcessor() {
         return new ItemProcessor<Integer, Integer>() {
 
             @Override
             public Integer process(Integer item) throws Exception {
-                if(item.equals(3)){
+                if (item.equals(3)) {
                     throw new IllegalArgumentException("No 3!");
                 }
-                if(item.equals(9)){
+                if (item.equals(9)) {
                     throw new NullPointerException("Fata at 9!");
                 }
                 return item;
@@ -44,16 +46,16 @@ public class JobConfig {
     }
 
     @Bean
-    public ItemWriter<Integer> itemWriter(){
+    public ItemWriter<Integer> itemWriter() {
         return items -> {
-          items.forEach(System.out::println);
+            items.forEach(System.out::println);
         };
     }
 
     @Bean
-    public Step step1(){
-        return stepBuilderFactory.get("step1")
-                .<Integer, Integer>chunk(2)
+    public Step step1() {
+        return new StepBuilder("step1", jobRepository)
+                .<Integer, Integer>chunk(2, manager)
                 .reader(itemReader())
                 .processor(itemProcessor())
                 .writer(itemWriter())
@@ -65,8 +67,8 @@ public class JobConfig {
     }
 
     @Bean
-    public Job job(){
-        return jobBuilderFactory.get("job")
+    public Job job() {
+        return new JobBuilder("job", jobRepository)
                 .start(step1())
                 .build();
     }

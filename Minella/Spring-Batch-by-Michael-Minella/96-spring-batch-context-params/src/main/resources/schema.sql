@@ -1,3 +1,7 @@
+drop database test;
+create database test;
+use test;
+
 CREATE TABLE `test`.`payment` (
   `paymentId` BIGINT NOT NULL AUTO_INCREMENT,
   `customerId` BIGINT NULL,
