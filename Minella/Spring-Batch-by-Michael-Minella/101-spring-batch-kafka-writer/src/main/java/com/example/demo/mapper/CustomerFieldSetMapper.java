@@ -20,5 +20,4 @@ public class CustomerFieldSetMapper implements FieldSetMapper<Customer> {
 				.birthdate(fieldSet.readRawString("birthdate"))
 				.build();
 	}
-
 }

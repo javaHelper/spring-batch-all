@@ -1,10 +1,13 @@
 package com.example.demo.config;
 
+import com.example.demo.mapper.CustomerFieldSetMapper;
+import com.example.demo.model.Customer;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
@@ -12,26 +15,20 @@ import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.item.kafka.KafkaItemWriter;
 import org.springframework.batch.item.kafka.builder.KafkaItemWriterBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.kafka.core.ConsumerFactory;
-import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
-
-import com.example.demo.mapper.CustomerFieldSetMapper;
-import com.example.demo.model.Customer;
-import com.fasterxml.jackson.databind.JsonDeserializer;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 public class JobConfig {
 
     @Autowired
-    private StepBuilderFactory stepBuilderFactory;
+    private JobRepository jobRepository;
 
     @Autowired
-    private JobBuilderFactory jobBuilderFactory;
+    private PlatformTransactionManager manager;
 
     @Autowired
     private KafkaTemplate<Long, Customer> kafkaTemplate;
@@ -65,8 +62,8 @@ public class JobConfig {
 
     @Bean
     public Step step1() throws Exception {
-        return stepBuilderFactory.get("step1")
-                .<Customer, Customer>chunk(10)
+        return new StepBuilder("step1", jobRepository)
+                .<Customer, Customer>chunk(10, manager)
                 .reader(customerItemReader())
                 .writer(kafkaItemWriter())
                 .build();
@@ -74,7 +71,7 @@ public class JobConfig {
 
     @Bean
     public Job job() throws Exception {
-        return jobBuilderFactory.get("job")
+        return new JobBuilder("job", jobRepository)
                 .incrementer(new RunIdIncrementer())
                 .start(step1())
                 .build();
