@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Properties;
+
 @RestController
 public class JobLaunchingController {
 	/*@Autowired
@@ -38,8 +40,13 @@ public class JobLaunchingController {
 				.addString("name", name)
 				.toJobParameters();*/
 		//JobExecution jobExecution = this.jobLauncher.run(job, jobParameters);
-		
-		this.jobOperator.start("job", String.format("name=%s", name));
+
+		Properties properties = new Properties();
+		properties.put("name", name);
+
+		this.jobOperator.start("job", properties);
+
+		// String.format("name=%s", name)
 	}
 	
 }

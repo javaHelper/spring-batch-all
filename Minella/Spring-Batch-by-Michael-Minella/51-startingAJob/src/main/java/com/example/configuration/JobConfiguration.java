@@ -2,17 +2,18 @@ package com.example.configuration;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.JobRegistry;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.launch.support.SimpleJobOperator;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
 
 
 /**
@@ -32,17 +34,14 @@ import org.springframework.stereotype.Component;
 public class JobConfiguration implements ApplicationContextAware{
 
 	@Autowired
-	private JobBuilderFactory jobBuilderFactory;
+	private JobRepository jobRepository;
 	
 	@Autowired
-	private StepBuilderFactory stepBuilderFactory;
+	private PlatformTransactionManager manager;
 	
 	@Autowired
 	private JobExplorer jobExplorer;
-	
-	@Autowired
-	private JobRepository jobRepository;
-	
+
 	@Autowired
 	private JobLauncher jobLauncher;
 	
@@ -88,14 +87,18 @@ public class JobConfiguration implements ApplicationContextAware{
 			return RepeatStatus.FINISHED;
 		};
 	}
+
+	@Bean
+	public TaskletStep getStep(Tasklet tasklet) {
+		return new StepBuilder("step1", jobRepository)
+				.tasklet(tasklet, manager)
+				.build();
+	}
 	
 	@Bean
     public Job job(Tasklet tasklet) {
-        return jobBuilderFactory.get("job")
-                .start(stepBuilderFactory.get("step1")
-                        .tasklet(tasklet)
-                        .build())
+        return new JobBuilder("job", jobRepository)
+                .start(getStep(tasklet))
                 .build();
     }
-	
 }
