@@ -34,7 +34,6 @@ public class StoredProcedureJobApplication {
 	@StepScope
 	public StoredProcedureItemReader<Customer> customerItemReader(DataSource dataSource,
 																  @Value("#{jobParameters['city']}") String city) {
-
 		return new StoredProcedureItemReaderBuilder<Customer>()
 				.name("customerItemReader")
 				.dataSource(dataSource)

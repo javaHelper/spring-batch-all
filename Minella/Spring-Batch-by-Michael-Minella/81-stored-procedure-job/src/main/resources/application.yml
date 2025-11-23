@@ -7,9 +7,14 @@ spring:
     url: jdbc:mysql://localhost:3306/test
     username: 'root'
     password: 'root'
+  sql:
+    init:
+      mode: ALWAYS
+      data-locations: classpath:schema-mysql.sql, classpath:data-mysql.sql
 
   jpa:
     show-sql: true
+    defer-datasource-initialization: true
     hibernate:
       naming:
         implicit-strategy: "org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl"
